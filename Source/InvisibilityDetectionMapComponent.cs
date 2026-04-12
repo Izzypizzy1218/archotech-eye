@@ -187,11 +187,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 
         if (newlyDetectedSightstealerForPlayer)
         {
-            Find.LetterStack.ReceiveLetter(
-                "ArchotechEyeInvisibilityDetection_SightstealerRevealedLabel".Translate(),
-                "ArchotechEyeInvisibilityDetection_SightstealerRevealedLetter".Translate(),
-                LetterDefOf.ThreatSmall,
-                lookTargets: null);
+            Messages.Message("ArchotechEyeInvisibilityDetection_SightstealerRevealed".Translate(), MessageTypeDefOf.CautionInput, historical: false);
         }
     }
 
