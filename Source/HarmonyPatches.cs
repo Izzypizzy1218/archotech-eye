@@ -24,10 +24,11 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Pawn), "Tick")]
-    [HarmonyPostfix]
-    private static void PawnTickPostfix()
+    [HarmonyFinalizer]
+    private static Exception PawnTickFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.CanHitTargetFrom))]
@@ -38,10 +39,11 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.CanHitTargetFrom))]
-    [HarmonyPostfix]
-    private static void VerbCanHitTargetFromPostfix()
+    [HarmonyFinalizer]
+    private static Exception VerbCanHitTargetFromFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.CanHitTarget))]
@@ -52,10 +54,11 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.CanHitTarget))]
-    [HarmonyPostfix]
-    private static void VerbCanHitTargetPostfix()
+    [HarmonyFinalizer]
+    private static Exception VerbCanHitTargetFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.ValidateTarget))]
@@ -66,10 +69,11 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.ValidateTarget))]
-    [HarmonyPostfix]
-    private static void VerbValidateTargetPostfix()
+    [HarmonyFinalizer]
+    private static Exception VerbValidateTargetFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.OrderForceTarget))]
@@ -80,10 +84,11 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.OrderForceTarget))]
-    [HarmonyPostfix]
-    private static void VerbOrderForceTargetPostfix()
+    [HarmonyFinalizer]
+    private static Exception VerbOrderForceTargetFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[] { typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool) })]
@@ -94,10 +99,26 @@ internal static class HarmonyPatches
     }
 
     [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[] { typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool) })]
-    [HarmonyPostfix]
-    private static void VerbTryStartCastOnPostfix()
+    [HarmonyFinalizer]
+    private static Exception VerbTryStartCastOnFinalizer(Exception __exception)
     {
         VisibilityContext.Pop();
+        return __exception;
+    }
+
+    [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[] { typeof(LocalTargetInfo), typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool) })]
+    [HarmonyPrefix]
+    private static void VerbTryStartCastOnWithDestinationPrefix(Verb __instance)
+    {
+        VisibilityContext.Push(__instance?.CasterPawn);
+    }
+
+    [HarmonyPatch(typeof(Verb), nameof(Verb.TryStartCastOn), new[] { typeof(LocalTargetInfo), typeof(LocalTargetInfo), typeof(bool), typeof(bool), typeof(bool), typeof(bool) })]
+    [HarmonyFinalizer]
+    private static Exception VerbTryStartCastOnWithDestinationFinalizer(Exception __exception)
+    {
+        VisibilityContext.Pop();
+        return __exception;
     }
 
     [HarmonyPatch(typeof(Pawn), nameof(Pawn.ThreatDisabled))]
@@ -259,7 +280,17 @@ internal static class HarmonyPatches
                 continue;
             }
 
-            if (!targets.Any(target => target.Thing == pawn))
+            bool alreadyPresent = false;
+            for (int i = 0; i < targets.Count; i++)
+            {
+                if (targets[i].Thing == pawn)
+                {
+                    alreadyPresent = true;
+                    break;
+                }
+            }
+
+            if (!alreadyPresent)
             {
                 targets.Insert(0, pawn);
             }

@@ -9,8 +9,12 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 {
     private const int RefreshIntervalTicks = 60;
 
-    private readonly Dictionary<Pawn, HashSet<Pawn>> detectedByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
-    private readonly HashSet<Pawn> detectedForPlayer = new HashSet<Pawn>();
+    private Dictionary<Pawn, HashSet<Pawn>> detectedByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
+    private Dictionary<Pawn, HashSet<Pawn>> previousDetectedByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
+    private HashSet<Pawn> detectedForPlayer = new HashSet<Pawn>();
+    private HashSet<Pawn> previousDetectedForPlayer = new HashSet<Pawn>();
+    private readonly List<Pawn> invisibleTargets = new List<Pawn>();
+    private readonly HashSet<Pawn> changedTargets = new HashSet<Pawn>();
     private int lastRefreshTick = -1;
 
     public InvisibilityDetectionMapComponent(Map map) : base(map)
@@ -56,24 +60,31 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
     private void RefreshDetectionCache()
     {
         lastRefreshTick = Find.TickManager.TicksGame;
-
-        Dictionary<Pawn, HashSet<Pawn>> previousByWatcher = CloneDetectionDictionary(detectedByWatcher);
-        HashSet<Pawn> previousForPlayer = new HashSet<Pawn>(detectedForPlayer);
-
+        Swap(ref detectedByWatcher, ref previousDetectedByWatcher);
+        Swap(ref detectedForPlayer, ref previousDetectedForPlayer);
         detectedByWatcher.Clear();
         detectedForPlayer.Clear();
+        invisibleTargets.Clear();
 
         IReadOnlyList<Pawn> spawnedPawns = map?.mapPawns?.AllPawnsSpawned;
         if (spawnedPawns == null || spawnedPawns.Count == 0)
         {
-            NotifyChangedTargets(previousByWatcher, previousForPlayer);
+            NotifyChangedTargets();
             return;
         }
 
-        List<Pawn> invisibleTargets = spawnedPawns.Where(ArchotechEyeVisibilityUtility.IsVanillaInvisible).ToList();
+        for (int i = 0; i < spawnedPawns.Count; i++)
+        {
+            Pawn spawnedPawn = spawnedPawns[i];
+            if (ArchotechEyeVisibilityUtility.IsVanillaInvisible(spawnedPawn))
+            {
+                invisibleTargets.Add(spawnedPawn);
+            }
+        }
+
         if (invisibleTargets.Count == 0)
         {
-            NotifyChangedTargets(previousByWatcher, previousForPlayer);
+            NotifyChangedTargets();
             return;
         }
 
@@ -109,7 +120,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
             }
         }
 
-        NotifyChangedTargets(previousByWatcher, previousForPlayer);
+        NotifyChangedTargets();
     }
 
     private static bool IsValidWatcher(Pawn watcher)
@@ -142,15 +153,15 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
         return GenSight.LineOfSight(watcher.Position, target.Position, map, skipFirstCell: true);
     }
 
-    private void NotifyChangedTargets(Dictionary<Pawn, HashSet<Pawn>> previousByWatcher, HashSet<Pawn> previousForPlayer)
+    private void NotifyChangedTargets()
     {
-        HashSet<Pawn> changedTargets = new HashSet<Pawn>();
+        changedTargets.Clear();
         bool newlyDetectedSightstealerForPlayer = false;
 
-        AddTargets(changedTargets, previousForPlayer);
+        AddTargets(changedTargets, previousDetectedForPlayer);
         AddTargets(changedTargets, detectedForPlayer);
 
-        foreach (KeyValuePair<Pawn, HashSet<Pawn>> pair in previousByWatcher)
+        foreach (KeyValuePair<Pawn, HashSet<Pawn>> pair in previousDetectedByWatcher)
         {
             AddTargets(changedTargets, pair.Value);
         }
@@ -173,7 +184,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 
         foreach (Pawn playerDetectedTarget in detectedForPlayer)
         {
-            if (previousForPlayer.Contains(playerDetectedTarget))
+            if (previousDetectedForPlayer.Contains(playerDetectedTarget))
             {
                 continue;
             }
@@ -191,17 +202,6 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
         }
     }
 
-    private static Dictionary<Pawn, HashSet<Pawn>> CloneDetectionDictionary(Dictionary<Pawn, HashSet<Pawn>> source)
-    {
-        Dictionary<Pawn, HashSet<Pawn>> clone = new Dictionary<Pawn, HashSet<Pawn>>();
-        foreach (KeyValuePair<Pawn, HashSet<Pawn>> pair in source)
-        {
-            clone[pair.Key] = new HashSet<Pawn>(pair.Value);
-        }
-
-        return clone;
-    }
-
     private static void AddTargets(HashSet<Pawn> accumulator, IEnumerable<Pawn> targets)
     {
         if (targets == null)
@@ -216,5 +216,12 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
                 accumulator.Add(target);
             }
         }
+    }
+
+    private static void Swap<T>(ref T left, ref T right)
+    {
+        T temp = left;
+        left = right;
+        right = temp;
     }
 }
