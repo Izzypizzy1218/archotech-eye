@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
   <name>초월공학 눈 - 투명 존재 감지</name>
-  <author>OpenAI Codex</author>
+  <author>izzy_pizzy</author>
   <packageId>codex.archotecheye.invisibilitydetection</packageId>
   <supportedVersions>
     <li>1.6</li>
@@ -12,5 +12,23 @@
       <displayName>Anomaly</displayName>
     </li>
   </modDependencies>
-  <description>ArchotechEye 헤디프를 보유한 폰이 18칸 + 시선 조건으로 투명화된 폰을 감지하도록 만들고, 감지된 대상은 AI 타겟팅 가능 및 반투명 실루엣으로 표시합니다.</description>
+  <description>필요 모드: Harmony
+필요 DLC: Anomaly
+
+강화된 초월공학 눈은 세계의 상식 너머를 비추어, 이면에 숨어 있는 존재들을 드러냅니다.
+
+이 모드는 초월공학 눈을 가진 폰이 주변의 투명화된 존재를 감지할 수 있게 해줍니다.
+감지된 대상은 반투명 실루엣으로 표시되며, 자동 전투와 수동 조준 모두 정상적으로 공격할 수 있습니다.
+
+주요 기능
+- 초월공학 눈 보유 폰이 반경 18칸 내 투명 존재 감지
+- 시야 수치와 무관하게 고정 범위 적용
+- 벽 등으로 시선이 막히면 감지 불가
+- 감지된 대상은 반투명 실루엣으로 표시
+- 감지된 대상은 AI 타겟팅 및 수동 공격 가능
+- 바닐라 투명화 시스템 기준으로 판정하여 타 모드와 호환성 고려
+
+주의
+- Anomaly의 망령을 포함한 투명화 폰을 대상으로 합니다
+- 투명화 DefName 하드코딩 대신 바닐라 판정 기준을 사용합니다</description>
 </ModMetaData>
