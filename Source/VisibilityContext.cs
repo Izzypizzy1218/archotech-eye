@@ -1,43 +1,59 @@
-using System.Collections.Generic;
+using System;
 using Verse;
 
 namespace ArchotechEye_InvisibilityDetection;
 
 internal static class VisibilityContext
 {
-    [System.ThreadStatic]
-    private static Stack<Pawn> currentSearchers;
+    [ThreadStatic]
+    private static Pawn currentSearcher;
 
-    public static Pawn CurrentSearcher
+    [ThreadStatic]
+    private static bool readingOriginal;
+
+    public static Pawn CurrentSearcher => currentSearcher;
+    public static bool ReadingOriginal => readingOriginal;
+
+    public static Scope Enter(Pawn observer)
     {
-        get
+        Scope scope = new Scope(currentSearcher);
+        currentSearcher = observer;
+        return scope;
+    }
+
+    public static OriginalScope EnterOriginal()
+    {
+        OriginalScope scope = new OriginalScope(readingOriginal);
+        readingOriginal = true;
+        return scope;
+    }
+
+    internal readonly struct Scope : IDisposable
+    {
+        private readonly Pawn previous;
+        private readonly bool entered;
+
+        public Scope(Pawn previous)
         {
-            if (currentSearchers == null || currentSearchers.Count == 0)
+            this.previous = previous;
+            entered = true;
+        }
+
+        public void Dispose()
+        {
+            if (entered)
             {
-                return null;
+                currentSearcher = previous;
             }
-
-            return currentSearchers.Peek();
         }
     }
 
-    public static void Push(Pawn pawn)
+    internal readonly struct OriginalScope : IDisposable
     {
-        if (currentSearchers == null)
-        {
-            currentSearchers = new Stack<Pawn>();
-        }
+        private readonly bool previous;
 
-        currentSearchers.Push(pawn);
-    }
+        public OriginalScope(bool previous) => this.previous = previous;
 
-    public static void Pop()
-    {
-        if (currentSearchers == null || currentSearchers.Count == 0)
-        {
-            return;
-        }
-
-        currentSearchers.Pop();
+        public void Dispose() => readingOriginal = previous;
     }
 }

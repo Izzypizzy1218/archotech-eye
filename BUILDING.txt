@@ -1,0 +1,32 @@
+Building the RimWorld 1.7 beta update
+
+Install a .NET 10 SDK, RimWorld 1.7 and the Harmony workshop mod.
+From this directory:
+
+  dotnet build Source/ArchotechEye_InvisibilityDetection.csproj -c Release
+
+The DLL is written to 1.7/Assemblies/. Game and Harmony references are not
+copied into the mod. Override non-default installation paths with:
+
+  -p:RimWorldDir="C:\path\to\RimWorld"
+  -p:HarmonyPath="C:\path\to\0Harmony.dll"
+
+Build automated checks with:
+
+  dotnet build Tests/ArchotechEye.Tests.csproj -c Release
+
+Run against the installed game's Waylith runtime with a .NET 10 host:
+
+  dotnet exec --runtimeconfig "GAME\RimWorld.runtimeconfig.json" --depsfile "GAME\RimWorld.deps.json" Tests/bin/Release/net10.0/ArchotechEye.Tests.dll "GAME" "HARMONY_ASSEMBLIES_DIRECTORY"
+
+Replace GAME and HARMONY_ASSEMBLIES_DIRECTORY with actual directories.
+The harness loads the real assemblies but does not start a game or modify
+save files. Its minimal map/pawn fixtures do not exercise the graphics UI.
+
+The root Assemblies/ DLL is the preserved 1.6 release. To rebuild for 1.6,
+use -p:RimWorldVersion=1.6 and a real 1.6 installation/reference directory.
+The 1.7 API cannot be used as a reference for a 1.6 build.
+
+Runtime load folders:
+  1.6: root (legacy DLL), Common (translations)
+  1.7: Common (translations), 1.7 (new DLL)

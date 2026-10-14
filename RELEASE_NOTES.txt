@@ -1,0 +1,31 @@
+Archotech Eye - Invisibility Detection 1.1.0-beta.1
+Tested against RimWorld 1.7.4977 rev1248 (unstable), 2026-10-15.
+
+Requirements: Harmony and Anomaly.
+
+RimWorld 1.7:
+- Separate .NET 10 assembly, using the game's UnityStubs compatibility types.
+- Fixed manual attack targeting without reflective ThingsUnderMouse calls.
+- Preserved downed, dormant and inactive threat exclusions during detection.
+- Covered both ordinary and interval pawn ticks and both cast overloads.
+- Restored observer context even when combat or target enumeration throws.
+- Read the game's full invisibility predicate, including multiple hediffs.
+- Published read-only detection snapshots for parallel render readers.
+- Rebuilt graphics only when player-visible detection changes.
+- Corrected the detection message to identify Revenant (Korean: mangryeong).
+
+Compatibility:
+- 18 tiles, line of sight, alpha 0.3, refresh every 60 game ticks.
+- Detection changes can take up to 60 ticks to appear/disappear.
+- No pop-up letters. A short detection message is retained.
+- No metalhorror implant detection.
+- RimWorld 1.6 loads the previously released, unchanged .NET Framework DLL.
+- Languages are shared through Common/. LoadFolders.xml selects one DLL.
+
+Validation:
+- Release build: no warnings or errors.
+- 51 assertions using the installed 1.7 game assemblies and Waylith CLR.
+- Includes Harmony registration, observer isolation, lazy targeting,
+  exceptions, multiple invisibility comps, radius boundary, wall blocking,
+  inactive target exclusions, silhouette alpha, portraits and despawning.
+- Automated checks do not replace visual playtesting of this beta build.

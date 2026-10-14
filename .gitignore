@@ -1,6 +1,10 @@
 Source/obj/
 Source/bin/
+Tests/obj/
+Tests/bin/
 .vs/
 *.user
 *.suo
 *.cache
+*.deps.json
+*.runtimeconfig.json

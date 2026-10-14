@@ -10,9 +10,9 @@ internal static class ArchotechEyeVisibilityUtility
     public const float RevealedAlpha = 0.3f;
 
     private static HediffDef cachedArchotechEyeDef;
-    private static ThingDef cachedSightstealerDef;
+    private static ThingDef cachedRevenantDef;
     private static bool archotechEyeResolved;
-    private static bool sightstealerResolved;
+    private static bool revenantResolved;
     private static bool missingArchotechEyeLogged;
 
     public static HediffDef ArchotechEyeDef
@@ -43,18 +43,18 @@ internal static class ArchotechEyeVisibilityUtility
         }
     }
 
-    public static ThingDef SightstealerDef
+    public static ThingDef RevenantDef
     {
         get
         {
-            if (sightstealerResolved)
+            if (revenantResolved)
             {
-                return cachedSightstealerDef;
+                return cachedRevenantDef;
             }
 
-            sightstealerResolved = true;
-            cachedSightstealerDef = DefDatabase<ThingDef>.GetNamedSilentFail("Sightstealer");
-            return cachedSightstealerDef;
+            revenantResolved = true;
+            cachedRevenantDef = DefDatabase<ThingDef>.GetNamedSilentFail("Revenant");
+            return cachedRevenantDef;
         }
     }
 
@@ -76,24 +76,22 @@ internal static class ArchotechEyeVisibilityUtility
             return false;
         }
 
-        HediffComp_Invisibility invisibilityComp = pawn.GetInvisibilityComp();
-        if (invisibilityComp == null)
+        // Read the vanilla predicate without letting our observer override feed back into the cache.
+        using (VisibilityContext.EnterOriginal())
         {
-            return false;
+            return pawn.IsPsychologicallyInvisible();
         }
-
-        return !invisibilityComp.PsychologicallyVisible;
     }
 
     public static bool IsDetectedBy(Pawn observer, Pawn target)
     {
-        if (observer == null || target == null || observer == target)
+        if (observer?.Spawned != true || target?.Spawned != true || observer == target || observer.Dead || target.Dead)
         {
             return false;
         }
 
-        Map map = observer.MapHeld;
-        if (map == null || target.MapHeld != map)
+        Map map = observer.Map;
+        if (map == null || target.Map != map)
         {
             return false;
         }
@@ -103,27 +101,27 @@ internal static class ArchotechEyeVisibilityUtility
 
     public static bool IsDetectedForPlayer(Pawn target)
     {
-        if (target == null)
+        if (target?.Spawned != true || target.Dead)
         {
             return false;
         }
 
-        return target.MapHeld?.GetComponent<InvisibilityDetectionMapComponent>()?.IsDetectedForPlayer(target) == true;
+        return target.Map?.GetComponent<InvisibilityDetectionMapComponent>()?.IsDetectedForPlayer(target) == true;
     }
 
-    public static bool IsSightstealer(Pawn pawn)
+    public static bool IsRevenant(Pawn pawn)
     {
         if (pawn == null)
         {
             return false;
         }
 
-        ThingDef sightstealerDef = SightstealerDef;
-        if (sightstealerDef == null)
+        ThingDef revenantDef = RevenantDef;
+        if (revenantDef == null)
         {
             return false;
         }
 
-        return pawn.def == sightstealerDef;
+        return pawn.def == revenantDef;
     }
 }

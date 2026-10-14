@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using RimWorld;
 using Verse;
 
@@ -9,11 +9,16 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 {
     private const int RefreshIntervalTicks = 60;
 
-    private Dictionary<Pawn, HashSet<Pawn>> detectedByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
-    private Dictionary<Pawn, HashSet<Pawn>> previousDetectedByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
-    private HashSet<Pawn> detectedForPlayer = new HashSet<Pawn>();
-    private HashSet<Pawn> previousDetectedForPlayer = new HashSet<Pawn>();
+    // Published collections are never modified, so parallel rendering can safely read them.
+    private sealed class DetectionSnapshot
+    {
+        public readonly Dictionary<Pawn, HashSet<Pawn>> ByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
+        public readonly HashSet<Pawn> ForPlayer = new HashSet<Pawn>();
+    }
+
+    private DetectionSnapshot snapshot = new DetectionSnapshot();
     private readonly List<Pawn> invisibleTargets = new List<Pawn>();
+    private readonly List<Pawn> watchers = new List<Pawn>();
     private readonly HashSet<Pawn> changedTargets = new HashSet<Pawn>();
     private int lastRefreshTick = -1;
 
@@ -23,80 +28,87 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 
     public override void MapComponentTick()
     {
-        base.MapComponentTick();
+        if (Find.TickManager == null)
+        {
+            return;
+        }
 
         int ticksGame = Find.TickManager.TicksGame;
-        if (ticksGame == 0 || lastRefreshTick < 0 || ticksGame - lastRefreshTick >= RefreshIntervalTicks)
+        if (lastRefreshTick < 0 || ticksGame - lastRefreshTick >= RefreshIntervalTicks)
         {
-            RefreshDetectionCache();
+            RefreshDetectionCache(ticksGame);
         }
+    }
+
+    public bool HasDetectedTargets(Pawn observer)
+    {
+        return observer != null && Volatile.Read(ref snapshot).ByWatcher.ContainsKey(observer);
     }
 
     public bool IsDetectedBy(Pawn observer, Pawn target)
     {
-        if (observer == null || target == null)
-        {
-            return false;
-        }
-
-        if (!detectedByWatcher.TryGetValue(observer, out HashSet<Pawn> detectedTargets))
-        {
-            return false;
-        }
-
-        return detectedTargets.Contains(target);
+        DetectionSnapshot current = Volatile.Read(ref snapshot);
+        return observer != null && target != null &&
+            current.ByWatcher.TryGetValue(observer, out HashSet<Pawn> targets) && targets.Contains(target);
     }
 
     public bool IsDetectedForPlayer(Pawn target)
     {
-        if (target == null)
-        {
-            return false;
-        }
-
-        return detectedForPlayer.Contains(target);
+        return target != null && Volatile.Read(ref snapshot).ForPlayer.Contains(target);
     }
 
-    private void RefreshDetectionCache()
+    public override void MapRemoved()
     {
-        lastRefreshTick = Find.TickManager.TicksGame;
-        Swap(ref detectedByWatcher, ref previousDetectedByWatcher);
-        Swap(ref detectedForPlayer, ref previousDetectedForPlayer);
-        detectedByWatcher.Clear();
-        detectedForPlayer.Clear();
+        Volatile.Write(ref snapshot, new DetectionSnapshot());
         invisibleTargets.Clear();
+        watchers.Clear();
+        changedTargets.Clear();
+    }
+
+    private void RefreshDetectionCache(int ticksGame)
+    {
+        DetectionSnapshot previous = Volatile.Read(ref snapshot);
+        invisibleTargets.Clear();
+        watchers.Clear();
 
         IReadOnlyList<Pawn> spawnedPawns = map?.mapPawns?.AllPawnsSpawned;
-        if (spawnedPawns == null || spawnedPawns.Count == 0)
+        if (spawnedPawns != null)
         {
-            NotifyChangedTargets();
-            return;
-        }
-
-        for (int i = 0; i < spawnedPawns.Count; i++)
-        {
-            Pawn spawnedPawn = spawnedPawns[i];
-            if (ArchotechEyeVisibilityUtility.IsVanillaInvisible(spawnedPawn))
+            for (int i = 0; i < spawnedPawns.Count; i++)
             {
-                invisibleTargets.Add(spawnedPawn);
+                Pawn pawn = spawnedPawns[i];
+                if (pawn?.Spawned == true && !pawn.Dead && ArchotechEyeVisibilityUtility.HasArchotechEye(pawn))
+                {
+                    watchers.Add(pawn);
+                }
+            }
+
+            // There is no reason to scan every hediff for invisibility if no observer can detect it.
+            if (watchers.Count > 0)
+            {
+                for (int i = 0; i < spawnedPawns.Count; i++)
+                {
+                    Pawn pawn = spawnedPawns[i];
+                    if (pawn?.Spawned == true && !pawn.Dead && ArchotechEyeVisibilityUtility.IsVanillaInvisible(pawn))
+                    {
+                        invisibleTargets.Add(pawn);
+                    }
+                }
             }
         }
 
-        if (invisibleTargets.Count == 0)
+        if (invisibleTargets.Count == 0 && previous.ByWatcher.Count == 0)
         {
-            NotifyChangedTargets();
+            lastRefreshTick = ticksGame;
             return;
         }
 
-        for (int i = 0; i < spawnedPawns.Count; i++)
+        DetectionSnapshot next = new DetectionSnapshot();
+        for (int i = 0; i < watchers.Count; i++)
         {
-            Pawn watcher = spawnedPawns[i];
-            if (!IsValidWatcher(watcher))
-            {
-                continue;
-            }
-
-            HashSet<Pawn> detectedTargets = null;
+            Pawn watcher = watchers[i];
+            bool revealForPlayer = watcher.IsColonistPlayerControlled;
+            HashSet<Pawn> targets = null;
             for (int j = 0; j < invisibleTargets.Count; j++)
             {
                 Pawn target = invisibleTargets[j];
@@ -105,123 +117,63 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
                     continue;
                 }
 
-                detectedTargets ??= new HashSet<Pawn>();
-                detectedTargets.Add(target);
-
-                if (watcher.IsColonistPlayerControlled)
+                if (targets == null)
                 {
-                    detectedForPlayer.Add(target);
+                    targets = new HashSet<Pawn>();
+                }
+
+                targets.Add(target);
+                if (revealForPlayer)
+                {
+                    next.ForPlayer.Add(target);
                 }
             }
 
-            if (detectedTargets != null)
+            if (targets != null)
             {
-                detectedByWatcher[watcher] = detectedTargets;
+                next.ByWatcher.Add(watcher, targets);
             }
         }
 
-        NotifyChangedTargets();
-    }
-
-    private static bool IsValidWatcher(Pawn watcher)
-    {
-        if (watcher?.Spawned != true)
-        {
-            return false;
-        }
-
-        return ArchotechEyeVisibilityUtility.HasArchotechEye(watcher);
+        Volatile.Write(ref snapshot, next);
+        lastRefreshTick = ticksGame;
+        NotifyChangedTargets(previous.ForPlayer, next.ForPlayer);
     }
 
     private bool CanWatcherDetectTarget(Pawn watcher, Pawn target)
     {
-        if (watcher == null || target == null || watcher == target)
-        {
-            return false;
-        }
-
-        if (!target.Spawned || target.MapHeld != map || watcher.MapHeld != map)
-        {
-            return false;
-        }
-
-        if (watcher.Position.DistanceTo(target.Position) > ArchotechEyeVisibilityUtility.DetectionRadius)
-        {
-            return false;
-        }
-
-        return GenSight.LineOfSight(watcher.Position, target.Position, map, skipFirstCell: true);
+        return watcher != target && watcher.Map == map && target.Map == map &&
+            watcher.Position.DistanceTo(target.Position) <= ArchotechEyeVisibilityUtility.DetectionRadius &&
+            GenSight.LineOfSight(watcher.Position, target.Position, map, skipFirstCell: true);
     }
 
-    private void NotifyChangedTargets()
+    private void NotifyChangedTargets(HashSet<Pawn> previous, HashSet<Pawn> current)
     {
         changedTargets.Clear();
-        bool newlyDetectedSightstealerForPlayer = false;
+        changedTargets.UnionWith(previous);
+        changedTargets.SymmetricExceptWith(current);
 
-        AddTargets(changedTargets, previousDetectedForPlayer);
-        AddTargets(changedTargets, detectedForPlayer);
-
-        foreach (KeyValuePair<Pawn, HashSet<Pawn>> pair in previousDetectedByWatcher)
+        Pawn newlyDetectedRevenant = null;
+        foreach (Pawn target in changedTargets)
         {
-            AddTargets(changedTargets, pair.Value);
-        }
-
-        foreach (KeyValuePair<Pawn, HashSet<Pawn>> pair2 in detectedByWatcher)
-        {
-            AddTargets(changedTargets, pair2.Value);
-        }
-
-        foreach (Pawn changedTarget in changedTargets)
-        {
-            if (changedTarget?.Spawned != true || changedTarget.Map != map)
+            if (target?.Spawned != true || target.Map != map)
             {
                 continue;
             }
 
-            map.attackTargetsCache?.UpdateTarget(changedTarget);
-            changedTarget.Drawer?.renderer?.SetAllGraphicsDirty();
-        }
-
-        foreach (Pawn playerDetectedTarget in detectedForPlayer)
-        {
-            if (previousDetectedForPlayer.Contains(playerDetectedTarget))
+            target.Drawer?.renderer?.SetAllGraphicsDirty();
+            if (newlyDetectedRevenant == null && current.Contains(target) &&
+                ArchotechEyeVisibilityUtility.IsRevenant(target))
             {
-                continue;
-            }
-
-            if (ArchotechEyeVisibilityUtility.IsSightstealer(playerDetectedTarget))
-            {
-                newlyDetectedSightstealerForPlayer = true;
-                break;
+                newlyDetectedRevenant = target;
             }
         }
 
-        if (newlyDetectedSightstealerForPlayer)
+        // Vanilla attackTargetsCache indexes hostility, not visibility; no re-registration is needed.
+        if (newlyDetectedRevenant != null)
         {
-            Messages.Message("ArchotechEyeInvisibilityDetection_SightstealerRevealed".Translate(), MessageTypeDefOf.CautionInput, historical: false);
+            Messages.Message("ArchotechEyeInvisibilityDetection_RevenantRevealed".Translate(),
+                newlyDetectedRevenant, MessageTypeDefOf.CautionInput, historical: false);
         }
-    }
-
-    private static void AddTargets(HashSet<Pawn> accumulator, IEnumerable<Pawn> targets)
-    {
-        if (targets == null)
-        {
-            return;
-        }
-
-        foreach (Pawn target in targets)
-        {
-            if (target != null)
-            {
-                accumulator.Add(target);
-            }
-        }
-    }
-
-    private static void Swap<T>(ref T left, ref T right)
-    {
-        T temp = left;
-        left = right;
-        right = temp;
     }
 }
