@@ -15,14 +15,17 @@ using Verse.AI;
 internal static class Program
 {
     private static int assertions;
+    private static string ratkinAnomalyDirectory;
 
     private static int Main(string[] args)
     {
         string gameDir = args.Length > 0 ? args[0] : @"C:\Program Files (x86)\Steam\steamapps\common\RimWorld";
         string harmonyDir = args.Length > 1 ? args[1] : @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies";
+        ratkinAnomalyDirectory = args.Length > 2 ? args[2] : @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\3716441120";
         AssemblyLoadContext.Default.Resolving += (context, name) =>
         {
-            foreach (string directory in new[] { gameDir, harmonyDir })
+            foreach (string directory in new[] { gameDir, harmonyDir, Path.Combine(ratkinAnomalyDirectory, "1.6", "Assemblies"),
+                @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\1578693166\1.7\Assemblies" })
             {
                 string path = Path.Combine(directory, name.Name + ".dll");
                 if (File.Exists(path))
@@ -35,7 +38,9 @@ internal static class Program
 
         try
         {
-            string modPath = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "ArchotechEye_InvisibilityDetection.dll");
+            string modPath = args.Length > 3 ? Path.GetFullPath(args[3]) :
+                Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "ArchotechEye_InvisibilityDetection.dll");
+            Console.WriteLine("Testing mod assembly: " + modPath);
             AssemblyLoadContext.Default.LoadFromAssemblyPath(modPath);
             Run();
             Console.WriteLine($"PASS: {assertions} assertions against installed RimWorld 1.7 assemblies.");
@@ -130,6 +135,7 @@ internal static class Program
         Check(parms.tint.a == 1f, "Portraits keep their alpha");
         TestMultipleInvisibilityHediffs();
         TestDetectionAndCombat();
+        TestRatkinAnomaly();
     }
 
     private static IEnumerable<LocalTargetInfo> Candidates(Pawn observer)
@@ -205,13 +211,16 @@ internal static class Program
 
         Pawn watcher = HealthyPawn(4, new IntVec3(5, 0, 5));
         Pawn otherWatcher = HealthyPawn(5, new IntVec3(6, 0, 5));
-        Pawn target = HealthyPawn(6, new IntVec3(23, 0, 5));
+        Pawn target = HealthyPawn(6, new IntVec3(41, 0, 5));
         target.health.hediffSet.hediffs.Add(InvisibilityHediff(target, -99999));
         MethodInfo canDetect = AccessTools.Method(typeof(InvisibilityDetectionMapComponent), "CanWatcherDetectTarget");
-        Check((bool)canDetect.Invoke(component, new object[] { watcher, target }), "Exactly 18 tiles is detected");
-        target.SetPositionDirect(new IntVec3(24, 0, 5));
-        Check(!(bool)canDetect.Invoke(component, new object[] { watcher, target }), "Beyond 18 tiles is rejected");
-        target.SetPositionDirect(new IntVec3(23, 0, 5));
+        Check(ArchotechEyeVisibilityUtility.DetectionRadius == 36f, "Detection radius is 36 tiles");
+        Check((bool)canDetect.Invoke(component, new object[] { watcher, target }), "Exactly 36 tiles is detected");
+        target.SetPositionDirect(new IntVec3(42, 0, 5));
+        Check(!(bool)canDetect.Invoke(component, new object[] { watcher, target }), "Beyond 36 tiles is rejected");
+        target.SetPositionDirect(new IntVec3(29, 0, 5));
+        Check((bool)canDetect.Invoke(component, new object[] { watcher, target }), "24 tiles is now in range");
+        target.SetPositionDirect(new IntVec3(41, 0, 5));
         Building wall = (Building)RuntimeHelpers.GetUninitializedObject(typeof(Building));
         wall.def = new ThingDef { fillPercent = 1f, category = ThingCategory.Building };
         int wallIndex = map.cellIndices.CellToIndex(new IntVec3(15, 0, 5));
@@ -251,9 +260,10 @@ internal static class Program
         Check(!component.HasDetectedTargets(watcher), "Removed map drops detection cache");
     }
 
-    private static Pawn HealthyPawn(int id, IntVec3 position)
+    private static Pawn HealthyPawn(int id, IntVec3 position, Type pawnType = null)
     {
-        Pawn pawn = BarePawn(id);
+        Pawn pawn = pawnType == null ? BarePawn(id) : (Pawn)RuntimeHelpers.GetUninitializedObject(pawnType);
+        pawn.thingIDNumber = id;
         pawn.def = new ThingDef { defName = "TestPawn", race = new RaceProperties() };
         AccessTools.Field(typeof(RaceProperties), "fleshType").SetValue(pawn.def.race, new FleshTypeDef { defName = "TestFlesh" });
         pawn.health = (Pawn_HealthTracker)RuntimeHelpers.GetUninitializedObject(typeof(Pawn_HealthTracker));
@@ -265,6 +275,63 @@ internal static class Program
         AccessTools.Field(typeof(Thing), "mapIndexOrState").SetValue(pawn, (sbyte)0);
         pawn.SetPositionDirect(position);
         return pawn;
+    }
+
+    private static void TestRatkinAnomaly()
+    {
+        string dllPath = Path.Combine(ratkinAnomalyDirectory, "1.6", "Assemblies", "RatkinAnomaly.dll");
+        if (!File.Exists(dllPath))
+        {
+            Console.WriteLine("SKIP: Ratkin Anomaly is not installed; generic invisibility checks still ran.");
+            return;
+        }
+
+        Assembly ratkin = AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
+        Map map = Current.Game.Maps[0];
+        InvisibilityDetectionMapComponent component = map.GetComponent<InvisibilityDetectionMapComponent>();
+        Pawn observer = HealthyPawn(20, new IntVec3(5, 0, 5));
+        Pawn otherObserver = HealthyPawn(21, new IntVec3(6, 0, 5));
+        MethodInfo canDetect = AccessTools.Method(typeof(InvisibilityDetectionMapComponent), "CanWatcherDetectTarget");
+        HediffDefOf.HoraxianInvisibility = new HediffDef { defName = "HoraxianInvisibility" };
+        int id = 30;
+        foreach (string name in new[] { "De_lovely", "Obsession" })
+        {
+            Type type = ratkin.GetType("RatkinAnomaly." + name, throwOnError: true);
+            Pawn target = HealthyPawn(id++, new IntVec3(41, 0, 5), type);
+            HediffWithComps hediff = InvisibilityHediff(target, -99999);
+            hediff.def = HediffDefOf.HoraxianInvisibility;
+            target.health.hediffSet.hediffs.Add(hediff);
+            object nativeComp = AccessTools.Property(type, "Invisibility").GetValue(target);
+            Check(ReferenceEquals(nativeComp, hediff.TryGetComp<HediffComp_Invisibility>()), name + " uses the actual vanilla invisibility comp");
+            Check(ArchotechEyeVisibilityUtility.IsVanillaInvisible(target), name + " is recognized as invisible");
+            Check((bool)canDetect.Invoke(component, new object[] { observer, target }), name + " can be detected at 36 tiles");
+            target.SetPositionDirect(new IntVec3(42, 0, 5));
+            Check(!(bool)canDetect.Invoke(component, new object[] { observer, target }), name + " stays hidden at 37 tiles");
+            target.SetPositionDirect(new IntVec3(41, 0, 5));
+            Building wall = (Building)RuntimeHelpers.GetUninitializedObject(typeof(Building));
+            wall.def = new ThingDef { fillPercent = 1f, category = ThingCategory.Building };
+            int wallIndex = map.cellIndices.CellToIndex(new IntVec3(15, 0, 5));
+            map.edificeGrid.InnerArray[wallIndex] = wall;
+            Check(!(bool)canDetect.Invoke(component, new object[] { observer, target }), name + " stays hidden behind a wall");
+            map.edificeGrid.InnerArray[wallIndex] = null;
+
+            object snapshot = AccessTools.Field(typeof(InvisibilityDetectionMapComponent), "snapshot").GetValue(component);
+            ((Dictionary<Pawn, HashSet<Pawn>>)AccessTools.Field(snapshot.GetType(), "ByWatcher").GetValue(snapshot))[observer] = new HashSet<Pawn> { target };
+            ((HashSet<Pawn>)AccessTools.Field(snapshot.GetType(), "ForPlayer").GetValue(snapshot)).Add(target);
+            using (VisibilityContext.Enter(observer))
+            {
+                Check(!target.IsPsychologicallyInvisible(), name + " passes targeting for its detecting observer");
+            }
+            using (VisibilityContext.Enter(otherObserver))
+            {
+                Check(target.IsPsychologicallyInvisible(), name + " remains invisible to other observers");
+            }
+            Check(!target.IsHiddenFromPlayer(), name + " is revealed to the player");
+            PawnDrawParms parms = new PawnDrawParms { tint = Color.white, flags = PawnRenderFlags.Invisible };
+            DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
+            Check(Math.Abs(parms.tint.a - 0.3f) < 0.001f, name + " renders at alpha 0.3");
+            Check(!((HediffComp_Invisibility)nativeComp).PsychologicallyVisible, name + " remains naturally invisible without forcing its quest discovery");
+        }
     }
 
     private static void Check(bool condition, string message)

@@ -6,7 +6,7 @@ namespace ArchotechEye_InvisibilityDetection;
 
 internal static class ArchotechEyeVisibilityUtility
 {
-    public const float DetectionRadius = 18f;
+    public const float DetectionRadius = 36f;
     public const float RevealedAlpha = 0.3f;
 
     private static HediffDef cachedArchotechEyeDef;

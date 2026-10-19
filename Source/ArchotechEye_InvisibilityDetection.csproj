@@ -6,6 +6,7 @@
     <RimWorldDir Condition="'$(RimWorldDir)' == ''">$(MSBuildProgramFiles32)\Steam\steamapps\common\RimWorld</RimWorldDir>
     <GameReferencesDir Condition="'$(RimWorldVersion)' == '1.7'">$(RimWorldDir)</GameReferencesDir>
     <GameReferencesDir Condition="'$(RimWorldVersion)' == '1.6'">$(RimWorldDir)\RimWorldWin64_Data\Managed</GameReferencesDir>
+    <UseRimWorldReferencePackage Condition="'$(UseRimWorldReferencePackage)' == '' and '$(RimWorldVersion)' == '1.6' and !Exists('$(GameReferencesDir)\Assembly-CSharp.dll')">true</UseRimWorldReferencePackage>
     <HarmonyPath Condition="'$(HarmonyPath)' == '' and '$(RimWorldVersion)' == '1.7'">$(MSBuildProgramFiles32)\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies\0Harmony.dll</HarmonyPath>
     <HarmonyPath Condition="'$(HarmonyPath)' == '' and '$(RimWorldVersion)' == '1.6'">$(UserProfile)\.nuget\packages\lib.harmony\2.3.3\lib\net472\0Harmony.dll</HarmonyPath>
     <LangVersion>latest</LangVersion>
@@ -15,24 +16,27 @@
     <OutputPath Condition="'$(RimWorldVersion)' == '1.7'">..\1.7\Assemblies\</OutputPath>
     <OutputPath Condition="'$(RimWorldVersion)' == '1.6'">..\Assemblies\</OutputPath>
     <AssemblyName>ArchotechEye_InvisibilityDetection</AssemblyName>
-    <Version>1.1.0-beta.1</Version>
+    <Version>1.1.0-beta.2</Version>
     <RootNamespace>ArchotechEye_InvisibilityDetection</RootNamespace>
     <GenerateDependencyFile>false</GenerateDependencyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Assembly-CSharp" HintPath="$(GameReferencesDir)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(GameReferencesDir)\Assembly-CSharp.dll" Private="false" Condition="'$(UseRimWorldReferencePackage)' != 'true'" />
     <Reference Include="0Harmony" HintPath="$(HarmonyPath)" Private="false" />
   </ItemGroup>
   <ItemGroup Condition="'$(RimWorldVersion)' == '1.7'">
     <Reference Include="UnityStubs" HintPath="$(GameReferencesDir)\UnityStubs.dll" Private="false" />
   </ItemGroup>
-  <ItemGroup Condition="'$(RimWorldVersion)' == '1.6'">
+  <ItemGroup Condition="'$(RimWorldVersion)' == '1.6' and '$(UseRimWorldReferencePackage)' != 'true'">
     <Reference Include="UnityEngine" HintPath="$(GameReferencesDir)\UnityEngine.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(GameReferencesDir)\UnityEngine.CoreModule.dll" Private="false" />
   </ItemGroup>
+  <ItemGroup Condition="'$(RimWorldVersion)' == '1.6' and '$(UseRimWorldReferencePackage)' == 'true'">
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.6.4871" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
   <Target Name="ValidateGameReferences" BeforeTargets="ResolveReferences">
-    <Error Condition="!Exists('$(GameReferencesDir)\Assembly-CSharp.dll')" Text="RimWorld $(RimWorldVersion) DLL not found. Set -p:RimWorldDir=your-game-directory." />
+    <Error Condition="'$(UseRimWorldReferencePackage)' != 'true' and !Exists('$(GameReferencesDir)\Assembly-CSharp.dll')" Text="RimWorld $(RimWorldVersion) DLL not found. Set -p:RimWorldDir=your-game-directory." />
     <Error Condition="!Exists('$(HarmonyPath)')" Text="Harmony DLL not found. Set -p:HarmonyPath=path-to-0Harmony.dll for the selected game version." />
   </Target>
 </Project>

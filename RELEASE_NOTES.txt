@@ -1,4 +1,23 @@
-Archotech Eye - Invisibility Detection 1.1.0-beta.1
+Archotech Eye - Invisibility Detection 1.1.0-beta.2
+Validated against RimWorld 1.7.4982 rev1280, 2026-10-19.
+
+- Increased detection radius from 18 to 36 tiles for BOTH 1.6 and 1.7.
+- Rebuilt the 1.6 DLL instead of leaving it on the old 18-tile behavior.
+- Confirmed Ratkin Anomaly support with its installed RatkinAnomaly.dll
+  (workshop item 3716441120). De_lovely and Obsession use the game's own
+  HediffComp_Invisibility and need no race-specific visibility override.
+- Added optional Ratkin Anomaly load order metadata, without a dependency.
+- Detection preserves the underlying invisible state and does not force
+  Ratkin Anomaly's hide-and-seek discovery or scripted exit events.
+- Fixed 36-tile range remains independent of sight capacity. Line of sight,
+  alpha 0.3 and 60-game-tick refresh behavior remain in place.
+- Both Release builds passed without warnings/errors. The 1.6 build uses
+  compile-time reference assemblies for 1.6.4871, not the installed 1.7 API.
+- 73 runtime assertions passed, including actual Ratkin Anomaly classes,
+  observer isolation, 36/37-tile boundaries, walls and silhouette alpha.
+- No in-game visual playtest or real 1.6 runtime playtest was performed.
+
+Previous release: 1.1.0-beta.1
 Tested against RimWorld 1.7.4977 rev1248 (unstable), 2026-10-15.
 
 Requirements: Harmony and Anomaly.

@@ -1,4 +1,4 @@
-Building the RimWorld 1.7 beta update
+Building the RimWorld 1.6 / 1.7 update
 
 Install a .NET 10 SDK, RimWorld 1.7 and the Harmony workshop mod.
 From this directory:
@@ -23,10 +23,26 @@ Replace GAME and HARMONY_ASSEMBLIES_DIRECTORY with actual directories.
 The harness loads the real assemblies but does not start a game or modify
 save files. Its minimal map/pawn fixtures do not exercise the graphics UI.
 
-The root Assemblies/ DLL is the preserved 1.6 release. To rebuild for 1.6,
-use -p:RimWorldVersion=1.6 and a real 1.6 installation/reference directory.
+The root Assemblies/ DLL is the 1.6 build. To rebuild it:
+
+  dotnet build Source/ArchotechEye_InvisibilityDetection.csproj -c Release -p:RimWorldVersion=1.6
+
+If a local 1.6 installation is unavailable, the project automatically uses
+Krafs.Rimworld.Ref 1.6.4871 (compile-time references only). It does not ship
+game assemblies with the mod. See https://www.nuget.org/packages/Krafs.Rimworld.Ref/1.6.4871
+Use -p:UseRimWorldReferencePackage=false to require local game references.
 The 1.7 API cannot be used as a reference for a 1.6 build.
 
+Ratkin Anomaly integration checks run automatically when workshop item
+3716441120 is installed. To use another copy, supply its mod root as the
+third argument to the test harness, after GAME and HARMONY_ASSEMBLIES_DIRECTORY.
+An optional fourth argument selects a specific mod DLL for compatibility
+testing under the 1.7 runtime (including the .NET Framework 1.6 build).
+The tests load its real De_lovely and Obsession classes and check their
+vanilla invisibility comps. Ratkin Anomaly is never a required dependency
+of the production assembly. Its hide-and-seek discovery events are not
+triggered by revealing a silhouette.
+
 Runtime load folders:
-  1.6: root (legacy DLL), Common (translations)
+  1.6: root (updated .NET Framework DLL), Common (translations)
   1.7: Common (translations), 1.7 (new DLL)
