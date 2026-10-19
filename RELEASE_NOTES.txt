@@ -1,4 +1,32 @@
-Archotech Eye - Invisibility Detection 1.1.0-beta.2
+Archotech Eye - Invisibility Detection 1.1.0-beta.3
+Validated against RimWorld 1.7.4982 rev1280, 2026-10-19.
+
+- Added an on-demand developer action under Archotech Eye:
+  Inspect invisibility compatibility. Click a pawn's cell to inspect it,
+  including invisible pawns. The report is available in English and Korean.
+- Reports the game's invisibility and hidden-from-player predicates with
+  only this mod's reveal override suppressed. Other mods' patches remain
+  active and their Harmony owner IDs are listed.
+- Includes pawn/hediff DefNames, classes, assemblies, source mods/package
+  IDs, native invisibility component states, and ThingComp type metadata.
+- Shows per-observer cached detection separately from current distance
+  and line of sight. It never refreshes or changes the detection cache.
+- Distinguishes active game invisibility, an inactive native component,
+  missing native evidence, and failed/unavailable evaluation. Missing
+  evidence does not prove a custom stealth system.
+- Exceptions from predicate/component evaluation are shown in the report;
+  custom stealth properties are not probed or executed by reflection.
+- Includes a Write Report to Log button. No new letter or automatic
+  notification is added. No diagnostics run during ticking or rendering.
+- Kept the 36-tile radius, 60-tick refresh, silhouette alpha and Ratkin
+  Anomaly discovery-event behavior unchanged.
+- Both 1.6 and 1.7 Release builds passed without warnings/errors.
+  116 assertions passed for each DLL under the installed 1.7 runtime.
+  A real 1.6 runtime and the in-game dialog were not visually playtested.
+- Steam publication is handled manually by the user. Repository updates
+  do not automatically upload this mod to Steam Workshop.
+
+Previous release: 1.1.0-beta.2
 Validated against RimWorld 1.7.4982 rev1280, 2026-10-19.
 
 - Increased detection radius from 18 to 36 tiles for BOTH 1.6 and 1.7.

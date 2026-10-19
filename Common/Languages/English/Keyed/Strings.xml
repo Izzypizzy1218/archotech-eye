@@ -2,4 +2,41 @@
 <LanguageData>
   <ArchotechEyeInvisibilityDetection_RevenantRevealed>An archotech eye has detected a hidden revenant.</ArchotechEyeInvisibilityDetection_RevenantRevealed>
   <ArchotechEyeInvisibilityDetection_SightstealerRevealed>A sightstealer has been revealed by an archotech eye.</ArchotechEyeInvisibilityDetection_SightstealerRevealed>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Title>Archotech Eye: Invisibility Diagnostics</ArchotechEyeInvisibilityDetection_Diagnostics_Title>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_ReadOnly>Developer-only, on-demand report. No invisibility, discovery events, targeting rules, or detection caches are changed.</ArchotechEyeInvisibilityDetection_Diagnostics_ReadOnly>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Target>Pawn ID | DefName | class [assembly] | mod [package ID]</ArchotechEyeInvisibilityDetection_Diagnostics_Target>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Spawned>Spawned</ArchotechEyeInvisibilityDetection_Diagnostics_Spawned>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Dead>Dead</ArchotechEyeInvisibilityDetection_Diagnostics_Dead>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Position>Position</ArchotechEyeInvisibilityDetection_Diagnostics_Position>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_GamePredicate>Game invisibility predicate, excluding this mod's reveal override</ArchotechEyeInvisibilityDetection_Diagnostics_GamePredicate>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_HiddenPredicate>Game hidden-from-player predicate, excluding this mod's reveal override</ArchotechEyeInvisibilityDetection_Diagnostics_HiddenPredicate>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State>Interpretation</ArchotechEyeInvisibilityDetection_Diagnostics_State>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_ActiveGameInvisibility>The game currently identifies this pawn as invisible using the predicate this mod reads. Actual detection also requires a living, spawned target and observer, the archotech eye, range and line of sight.</ArchotechEyeInvisibilityDetection_Diagnostics_State_ActiveGameInvisibility>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_InactiveVanillaComponent>A vanilla invisibility component exists, but the game does not currently consider this pawn invisible. It may be visible, disrupted, or fading.</ArchotechEyeInvisibilityDetection_Diagnostics_State_InactiveVanillaComponent>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_NoVanillaEvidence>The game does not currently report invisibility and no vanilla invisibility component was found. This may be an ordinary visible pawn or a custom stealth system; custom stealth cannot be confirmed automatically.</ArchotechEyeInvisibilityDetection_Diagnostics_State_NoVanillaEvidence>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_Unavailable>Could not evaluate invisibility. Review missing health data or the error below/above; no compatibility conclusion can be drawn.</ArchotechEyeInvisibilityDetection_Diagnostics_State_Unavailable>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PredicateNote>Other mods' Harmony patches still participate in these predicates. The hidden-from-player result also respects the game's Show Hidden Pawns setting and player-faction visibility. Component names are evidence, not an independent stealth detector.</ArchotechEyeInvisibilityDetection_Diagnostics_PredicateNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CachedForPlayer>Cached detection for the player</ArchotechEyeInvisibilityDetection_Diagnostics_CachedForPlayer>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CacheTick>Last cache refresh tick (-1 = not refreshed)</ArchotechEyeInvisibilityDetection_Diagnostics_CacheTick>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CurrentTick>Current game tick</ArchotechEyeInvisibilityDetection_Diagnostics_CurrentTick>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CacheNote>Detection uses a fixed 36-tile radius and refreshes every 60 game ticks. Distance and line of sight below are measured only for this report; they do not refresh the cache. Line of sight is not checked outside the radius. A changed position or wall can temporarily disagree with the cached result.</ArchotechEyeInvisibilityDetection_Diagnostics_CacheNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Hediffs>Hediffs and their component types (DefName | class [assembly] | mod [package ID])</ArchotechEyeInvisibilityDetection_Diagnostics_Hediffs>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Active>Currently invisible according to this component</ArchotechEyeInvisibilityDetection_Diagnostics_Active>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_VisibleToPlayer>Component configured as visible to player</ArchotechEyeInvisibilityDetection_Diagnostics_VisibleToPlayer>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PawnComps>Pawn ThingComp types (metadata only; custom properties are not executed)</ArchotechEyeInvisibilityDetection_Diagnostics_PawnComps>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Observers>Archotech-eye observers on this map</ArchotechEyeInvisibilityDetection_Diagnostics_Observers>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_HasEye>Has archotech eye</ArchotechEyeInvisibilityDetection_Diagnostics_HasEye>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PlayerControlled>Player-controlled colonist (contributes to player silhouettes)</ArchotechEyeInvisibilityDetection_Diagnostics_PlayerControlled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Distance>Current distance in tiles</ArchotechEyeInvisibilityDetection_Diagnostics_Distance>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_LineOfSight>Current line of sight</ArchotechEyeInvisibilityDetection_Diagnostics_LineOfSight>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Cached>Cached detection by this observer</ArchotechEyeInvisibilityDetection_Diagnostics_Cached>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Patches>Harmony owners on the game's invisibility predicates (includes this mod)</ArchotechEyeInvisibilityDetection_Diagnostics_Patches>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Yes>Yes</ArchotechEyeInvisibilityDetection_Diagnostics_Yes>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_No>No</ArchotechEyeInvisibilityDetection_Diagnostics_No>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_NotChecked>Not evaluated / unavailable</ArchotechEyeInvisibilityDetection_Diagnostics_NotChecked>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Error>Evaluation failed</ArchotechEyeInvisibilityDetection_Diagnostics_Error>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_None>None</ArchotechEyeInvisibilityDetection_Diagnostics_None>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>Write Report to Log</ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>Developer setting: Show Hidden Pawns</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>Living and spawned</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
 </LanguageData>

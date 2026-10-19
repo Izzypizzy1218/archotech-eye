@@ -89,7 +89,7 @@ internal static class PlayerVisibilityPatch
 {
     private static void Postfix(Pawn pawn, ref bool __result)
     {
-        if (__result && ArchotechEyeVisibilityUtility.IsDetectedForPlayer(pawn))
+        if (__result && !VisibilityContext.ReadingOriginal && ArchotechEyeVisibilityUtility.IsDetectedForPlayer(pawn))
         {
             __result = false;
         }

@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
+using System.Xml.Linq;
 using ArchotechEye_InvisibilityDetection;
 using HarmonyLib;
+using LudeonTK;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -136,6 +138,7 @@ internal static class Program
         TestMultipleInvisibilityHediffs();
         TestDetectionAndCombat();
         TestRatkinAnomaly();
+        TestDiagnostics();
     }
 
     private static IEnumerable<LocalTargetInfo> Candidates(Pawn observer)
@@ -331,6 +334,195 @@ internal static class Program
             DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
             Check(Math.Abs(parms.tint.a - 0.3f) < 0.001f, name + " renders at alpha 0.3");
             Check(!((HediffComp_Invisibility)nativeComp).PsychologicallyVisible, name + " remains naturally invisible without forcing its quest discovery");
+            InvisibilityDiagnosticReport report = InvisibilityDiagnostics.Inspect(target);
+            Check(report.State == InvisibilityDiagnosticState.ActiveGameInvisibility,
+                name + " diagnostic recognizes the game's invisibility system");
+            Check(report.Identity.Contains(type.FullName) && report.Hediffs[0].InvisibilityComponents.Count == 1,
+                name + " diagnostic includes its real class and vanilla component");
+        }
+    }
+
+    private static void TestDiagnostics()
+    {
+        InvisibilityDiagnosticReport empty = InvisibilityDiagnostics.Inspect(null);
+        Check(empty.State == InvisibilityDiagnosticState.Unavailable, "Null diagnostic target is inconclusive");
+        Check(!string.IsNullOrEmpty(InvisibilityDiagnostics.Format(empty)), "Null diagnostic report can be formatted");
+
+        Pawn missingHealth = BarePawn(70);
+        AccessTools.Field(typeof(Thing), "mapIndexOrState").SetValue(missingHealth, (sbyte)-1);
+        Check(InvisibilityDiagnostics.Inspect(missingHealth).State == InvisibilityDiagnosticState.Unavailable,
+            "Missing health does not produce a false stealth conclusion");
+
+        MethodInfo debugAction = AccessTools.Method(typeof(InvisibilityDiagnosticsDebugActions), "InspectPawn");
+        DebugActionAttribute attribute = debugAction.GetCustomAttribute<DebugActionAttribute>();
+        Check(attribute?.actionType == DebugActionType.ToolMapForPawns &&
+            attribute.allowedGameStates == AllowedGameStates.PlayingOnMap,
+            "Diagnostic is registered as an on-demand pawn debug tool");
+
+        Map map = Current.Game.Maps[0];
+        InvisibilityDetectionMapComponent component = map.GetComponent<InvisibilityDetectionMapComponent>();
+        Pawn observer = HealthyPawn(71, new IntVec3(5, 0, 5));
+        Pawn target = HealthyPawn(72, new IntVec3(41, 0, 5));
+        HediffDef eyeDef = new HediffDef { defName = "ArchotechEye" };
+        AccessTools.Field(typeof(ArchotechEyeVisibilityUtility), "cachedArchotechEyeDef").SetValue(null, eyeDef);
+        AccessTools.Field(typeof(ArchotechEyeVisibilityUtility), "archotechEyeResolved").SetValue(null, true);
+        observer.health.hediffSet.hediffs.Add(new Hediff { pawn = observer, def = eyeDef });
+        map.mapPawns = (MapPawns)RuntimeHelpers.GetUninitializedObject(typeof(MapPawns));
+        AccessTools.Field(typeof(MapPawns), "pawnsSpawned").SetValue(map.mapPawns, new List<Pawn> { observer, target, null });
+        HediffWithComps invisibility = InvisibilityHediff(target, -99999);
+        target.health.hediffSet.hediffs.Add(invisibility);
+        object snapshot = AccessTools.Field(typeof(InvisibilityDetectionMapComponent), "snapshot").GetValue(component);
+        ((Dictionary<Pawn, HashSet<Pawn>>)AccessTools.Field(snapshot.GetType(), "ByWatcher").GetValue(snapshot))[observer] = new HashSet<Pawn> { target };
+        ((HashSet<Pawn>)AccessTools.Field(snapshot.GetType(), "ForPlayer").GetValue(snapshot)).Add(target);
+        int previousRefresh = component.LastRefreshTick;
+        int invisibleTick = target.mindState.lastBecameInvisibleTick;
+        int visibleTick = target.mindState.lastBecameVisibleTick;
+        int hediffCount = target.health.hediffSet.hediffs.Count;
+
+        using (VisibilityContext.Enter(observer))
+        {
+            Check(!target.IsPsychologicallyInvisible(), "Diagnostic fixture is revealed by the normal observer override");
+            InvisibilityDiagnosticReport report = InvisibilityDiagnostics.Inspect(target);
+            Check(report.GameInvisible.Value == true && report.HiddenFromPlayer.Value == true,
+                "Diagnostic bypasses only this mod's visibility overrides");
+            Check(report.State == InvisibilityDiagnosticState.ActiveGameInvisibility,
+                "Active game predicate is reported as supported invisibility");
+            Check(report.CachedForPlayer.Value == true && report.LastRefreshTick == previousRefresh,
+                "Diagnostic reports the existing cache and refresh tick");
+            Check(report.PatchOwners.Any(entry => entry.Contains(ArchotechEyeInvisibilityDetectionMod.HarmonyId)),
+                "Diagnostic lists Harmony predicate owners");
+            Check(report.Hediffs[0].InvisibilityComponents[0].Active.Value == true,
+                "Diagnostic includes the active vanilla invisibility component");
+            Check(report.Observers.Count == 1 && report.Observers[0].Cached.Value == true &&
+                report.Observers[0].AliveAndSpawned.Value == true,
+                "Diagnostic collects archotech-eye observers from the map without registering new pawns");
+            Check(InvisibilityDiagnostics.Format(report).Contains("Verse.HediffComp_Invisibility"),
+                "Formatted report includes component identity");
+            Check(VisibilityContext.CurrentSearcher == observer && !VisibilityContext.ReadingOriginal,
+                "Diagnostic restores the caller's observer and suppression scope");
+        }
+        Check(ReferenceEquals(snapshot, AccessTools.Field(typeof(InvisibilityDetectionMapComponent), "snapshot").GetValue(component)) &&
+            component.LastRefreshTick == previousRefresh, "Diagnostic never replaces or refreshes the detection cache");
+        Check(target.mindState.lastBecameInvisibleTick == invisibleTick && target.mindState.lastBecameVisibleTick == visibleTick &&
+            target.health.hediffSet.hediffs.Count == hediffCount, "Diagnostic leaves invisibility and hediff state unchanged");
+
+        bool previousShowHidden = DebugSettings.showHiddenPawns;
+        try
+        {
+            DebugSettings.showHiddenPawns = true;
+            InvisibilityDiagnosticReport debugVisible = InvisibilityDiagnostics.Inspect(target);
+            Check(debugVisible.ShowHiddenPawns && debugVisible.HiddenFromPlayer.Value == false && debugVisible.GameInvisible.Value == true,
+                "Show Hidden Pawns is reported without being confused with game invisibility");
+        }
+        finally
+        {
+            DebugSettings.showHiddenPawns = previousShowHidden;
+        }
+
+        ObserverDiagnostic observerReport = InvisibilityDiagnostics.InspectObserver(observer, target);
+        Check(observerReport.HasEye.Value == true && observerReport.Distance == 36f && observerReport.LineOfSight.Value == true,
+            "Observer diagnostic checks the 36-tile boundary and line of sight on demand");
+        Check(observerReport.Cached.Value == true, "Observer diagnostic reads its own cached detection");
+        Pawn otherObserver = HealthyPawn(73, new IntVec3(6, 0, 5));
+        Check(InvisibilityDiagnostics.InspectObserver(otherObserver, target).Cached.Value == false,
+            "Diagnostic does not share another observer's cached detection");
+        Building wall = (Building)RuntimeHelpers.GetUninitializedObject(typeof(Building));
+        wall.def = new ThingDef { fillPercent = 1f, category = ThingCategory.Building };
+        int wallIndex = map.cellIndices.CellToIndex(new IntVec3(15, 0, 5));
+        map.edificeGrid.InnerArray[wallIndex] = wall;
+        observerReport = InvisibilityDiagnostics.InspectObserver(observer, target);
+        Check(observerReport.LineOfSight.Value == false && observerReport.Cached.Value == true,
+            "Report distinguishes a newly blocked line of sight from stale cached detection");
+        map.edificeGrid.InnerArray[wallIndex] = null;
+        target.SetPositionDirect(new IntVec3(42, 0, 5));
+        observerReport = InvisibilityDiagnostics.InspectObserver(observer, target);
+        Check(observerReport.Distance == 37f && observerReport.LineOfSight.Value == null,
+            "Diagnostic skips line-of-sight checks beyond 36 tiles");
+        Check(InvisibilityDiagnostics.InspectObserver(null, target).Distance == null,
+            "Null diagnostic observer is safe");
+
+        HediffComp_Invisibility native = invisibility.TryGetComp<HediffComp_Invisibility>();
+        AccessTools.Field(typeof(HediffComp_Invisibility), "lastDisrupted").SetValue(native, Current.Game.tickManager.TicksGame);
+        Check(InvisibilityDiagnostics.Inspect(target).State == InvisibilityDiagnosticState.InactiveVanillaComponent,
+            "Disrupted invisibility is distinguished from custom stealth");
+        target.health.hediffSet.hediffs.Clear();
+        Check(InvisibilityDiagnostics.Inspect(target).State == InvisibilityDiagnosticState.NoVanillaEvidence,
+            "Ordinary visible pawn is not mislabeled as a custom stealth system");
+
+        ThrowingStealthMetadataComp custom = new ThrowingStealthMetadataComp();
+        AccessTools.Field(typeof(ThingWithComps), "comps").SetValue(target, new List<ThingComp> { custom });
+        InvisibilityDiagnosticReport customReport = InvisibilityDiagnostics.Inspect(target);
+        Check(customReport.PawnComponentTypes.Any(type => type.Contains(nameof(ThrowingStealthMetadataComp))) && custom.Reads == 0,
+            "Custom component metadata is included without executing arbitrary stealth getters");
+        Check(customReport.State == InvisibilityDiagnosticState.NoVanillaEvidence,
+            "A stealth-like component name is not used as proof of invisibility");
+
+        Harmony external = new Harmony("archotecheye.tests.external-invisibility");
+        MethodInfo predicate = AccessTools.Method(typeof(InvisibilityUtility), nameof(InvisibilityUtility.IsPsychologicallyInvisible));
+        external.Patch(predicate, prefix: new HarmonyMethod(typeof(Program), nameof(ExternalInvisiblePrefix)));
+        try
+        {
+            InvisibilityDiagnosticReport patched = InvisibilityDiagnostics.Inspect(target);
+            Check(patched.GameInvisible.Value == true && patched.State == InvisibilityDiagnosticState.ActiveGameInvisibility,
+                "Diagnostic respects another mod's game-predicate patch without requiring a vanilla comp");
+            Check(patched.PatchOwners.Any(entry => entry.Contains(external.Id)),
+                "Diagnostic identifies the external predicate patch owner");
+        }
+        finally
+        {
+            external.Unpatch(predicate, HarmonyPatchType.All, external.Id);
+        }
+
+        native.props = new HediffCompProperties();
+        target.health.hediffSet.hediffs.Add(invisibility);
+        InvisibilityDiagnosticReport broken = InvisibilityDiagnostics.Inspect(target);
+        Check(broken.State == InvisibilityDiagnosticState.Unavailable && broken.GameInvisible.Error == nameof(InvalidCastException),
+            "A failing invisibility predicate is captured rather than treated as visible");
+        Check(broken.Hediffs[0].InvisibilityComponents[0].Active.Error == nameof(InvalidCastException),
+            "Broken invisibility component is reported independently");
+        Check(!VisibilityContext.ReadingOriginal && VisibilityContext.CurrentSearcher == null,
+            "A failed diagnostic restores visibility context");
+        Check(InvisibilityDiagnostics.Format(broken).Contains(nameof(InvalidCastException)),
+            "Evaluation failures are included in the formatted report");
+        Check(InvisibilityDiagnostics.Classify(new DiagnosticBool { Value = true }, 0) == InvisibilityDiagnosticState.ActiveGameInvisibility,
+            "Game predicate is authoritative even without a known component");
+
+        TestDiagnosticTranslations();
+    }
+
+    private static bool ExternalInvisiblePrefix(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
+    private sealed class ThrowingStealthMetadataComp : ThingComp
+    {
+        public int Reads;
+        public bool Invisible
+        {
+            get
+            {
+                Reads++;
+                throw new InvalidOperationException("Diagnostic must not execute custom properties.");
+            }
+        }
+    }
+
+    private static void TestDiagnosticTranslations()
+    {
+        string root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "..", "..", "..", ".."));
+        HashSet<string> english = XDocument.Load(Path.Combine(root, "Common", "Languages", "English", "Keyed", "Strings.xml"))
+            .Root.Elements().Select(element => element.Name.LocalName).ToHashSet();
+        XDocument koreanXml = XDocument.Load(Path.Combine(root, "Common", "Languages", "Korean", "Keyed", "Strings.xml"));
+        HashSet<string> korean = koreanXml.Root.Elements().Select(element => element.Name.LocalName).ToHashSet();
+        Check(english.SetEquals(korean), "English and Korean diagnostic translation keys match");
+        Check(koreanXml.Root.Elements().All(element => !string.IsNullOrWhiteSpace(element.Value)),
+            "Korean diagnostic translations are nonempty");
+        foreach (InvisibilityDiagnosticState state in Enum.GetValues<InvisibilityDiagnosticState>())
+        {
+            Check(english.Contains("ArchotechEyeInvisibilityDetection_Diagnostics_State_" + state),
+                "Diagnostic state has a translation: " + state);
         }
     }
 

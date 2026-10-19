@@ -22,6 +22,8 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
     private readonly HashSet<Pawn> changedTargets = new HashSet<Pawn>();
     private int lastRefreshTick = -1;
 
+    internal int LastRefreshTick => lastRefreshTick;
+
     public InvisibilityDetectionMapComponent(Map map) : base(map)
     {
     }

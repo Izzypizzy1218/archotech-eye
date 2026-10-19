@@ -2,4 +2,41 @@
 <LanguageData>
   <ArchotechEyeInvisibilityDetection_RevenantRevealed>초월공학 눈이 숨어 있던 망령을 포착했습니다.</ArchotechEyeInvisibilityDetection_RevenantRevealed>
   <ArchotechEyeInvisibilityDetection_SightstealerRevealed>초월공학 눈이 망령의 모습을 포착했습니다.</ArchotechEyeInvisibilityDetection_SightstealerRevealed>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Title>초월공학 눈: 투명화 호환성 진단</ArchotechEyeInvisibilityDetection_Diagnostics_Title>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_ReadOnly>개발자용 수동 진단입니다. 투명 상태, 발견 이벤트, 공격 규칙, 감지 캐시를 변경하지 않습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_ReadOnly>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Target>폰 ID | DefName | 클래스 [어셈블리] | 모드 [패키지 ID]</ArchotechEyeInvisibilityDetection_Diagnostics_Target>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Spawned>맵에 생성됨</ArchotechEyeInvisibilityDetection_Diagnostics_Spawned>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Dead>사망 상태</ArchotechEyeInvisibilityDetection_Diagnostics_Dead>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Position>위치</ArchotechEyeInvisibilityDetection_Diagnostics_Position>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_GamePredicate>게임의 투명화 판정 (이 모드의 감지 보정 제외)</ArchotechEyeInvisibilityDetection_Diagnostics_GamePredicate>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_HiddenPredicate>게임의 플레이어에게 숨김 판정 (이 모드의 감지 보정 제외)</ArchotechEyeInvisibilityDetection_Diagnostics_HiddenPredicate>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State>진단 해석</ArchotechEyeInvisibilityDetection_Diagnostics_State>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_ActiveGameInvisibility>이 모드가 이용하는 게임 판정에서 현재 투명 상태입니다. 실제 감지에는 대상과 관찰자의 생존·맵 생성 상태, 초월공학 눈, 거리·시선 조건도 필요합니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_ActiveGameInvisibility>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_InactiveVanillaComponent>바닐라 투명화 구성요소가 있지만, 게임은 현재 투명 상태로 판정하지 않습니다. 투명화 해제·방해·전환 중일 수 있습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_InactiveVanillaComponent>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_NoVanillaEvidence>게임의 투명화 판정이 아니며 바닐라 투명화 구성요소도 없습니다. 보통의 보이는 폰이거나 별도 은신 방식일 수 있으므로, 별도 은신이라고 단정할 수 없습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_NoVanillaEvidence>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_Unavailable>투명화 상태를 평가할 수 없습니다. 건강 데이터 누락이나 판정 오류를 확인해야 하며, 호환 여부를 단정할 수 없습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_Unavailable>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PredicateNote>다른 모드의 Harmony 패치는 이 판정에 계속 반영됩니다. 플레이어에게 숨김 판정에는 게임의 숨은 폰 표시 설정과 플레이어 소속 여부도 영향을 줍니다. 구성요소 이름만으로 별도 은신 여부를 판정하지 않습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_PredicateNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CachedForPlayer>플레이어용 감지 캐시</ArchotechEyeInvisibilityDetection_Diagnostics_CachedForPlayer>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CacheTick>마지막 캐시 갱신 틱 (-1은 갱신 전)</ArchotechEyeInvisibilityDetection_Diagnostics_CacheTick>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CurrentTick>현재 게임 틱</ArchotechEyeInvisibilityDetection_Diagnostics_CurrentTick>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_CacheNote>감지는 고정 반경 36칸이며 60게임 틱마다 갱신됩니다. 아래 거리·시선은 이 보고서를 위해서만 측정하며 캐시를 갱신하지 않습니다. 범위 밖에서는 시선을 검사하지 않습니다. 위치나 벽이 바뀐 직후에는 캐시와 현재 조건이 잠시 다를 수 있습니다.</ArchotechEyeInvisibilityDetection_Diagnostics_CacheNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Hediffs>헤디프와 구성요소 (DefName | 클래스 [어셈블리] | 모드 [패키지 ID])</ArchotechEyeInvisibilityDetection_Diagnostics_Hediffs>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Active>이 구성요소 기준 현재 투명 상태</ArchotechEyeInvisibilityDetection_Diagnostics_Active>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_VisibleToPlayer>구성요소의 플레이어에게 보이기 설정</ArchotechEyeInvisibilityDetection_Diagnostics_VisibleToPlayer>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PawnComps>폰의 ThingComp 종류 (메타데이터만 확인, 별도 속성 실행 안 함)</ArchotechEyeInvisibilityDetection_Diagnostics_PawnComps>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Observers>이 맵의 초월공학 눈 관찰자</ArchotechEyeInvisibilityDetection_Diagnostics_Observers>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_HasEye>초월공학 눈 보유</ArchotechEyeInvisibilityDetection_Diagnostics_HasEye>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_PlayerControlled>플레이어가 제어하는 식민지인 (실루엣 표시에 기여)</ArchotechEyeInvisibilityDetection_Diagnostics_PlayerControlled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Distance>현재 거리 (칸)</ArchotechEyeInvisibilityDetection_Diagnostics_Distance>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_LineOfSight>현재 시선 연결</ArchotechEyeInvisibilityDetection_Diagnostics_LineOfSight>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Cached>이 관찰자의 감지 캐시</ArchotechEyeInvisibilityDetection_Diagnostics_Cached>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Patches>게임 투명화 판정에 적용된 Harmony 패치 ID (이 모드 포함)</ArchotechEyeInvisibilityDetection_Diagnostics_Patches>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Yes>예</ArchotechEyeInvisibilityDetection_Diagnostics_Yes>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_No>아니요</ArchotechEyeInvisibilityDetection_Diagnostics_No>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_NotChecked>미검사 / 확인 불가</ArchotechEyeInvisibilityDetection_Diagnostics_NotChecked>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_Error>판정 중 오류</ArchotechEyeInvisibilityDetection_Diagnostics_Error>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_None>없음</ArchotechEyeInvisibilityDetection_Diagnostics_None>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>보고서를 로그에 기록</ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>개발자 설정: 숨은 폰 표시</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>생존 및 맵 생성 상태</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
 </LanguageData>

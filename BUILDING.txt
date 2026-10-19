@@ -43,6 +43,43 @@ vanilla invisibility comps. Ratkin Anomaly is never a required dependency
 of the production assembly. Its hide-and-seek discovery events are not
 triggered by revealing a silhouette.
 
+Developer-only compatibility diagnostics (1.1.0-beta.3):
+  1. Enable Development mode in RimWorld's options.
+  2. Open the developer Debug actions menu and search for:
+       Inspect invisibility compatibility
+     Category: Archotech Eye.
+  3. Click the pawn's cell. The native debug pawn tool also finds invisible
+     pawns in that cell; it does not reveal the rest of the map. Multiple
+     pawns in one cell can open multiple reports. Right-click to exit the tool.
+  4. Read the report, or use Write Report to Log to retain it in Player.log.
+
+Reports are localized in English and Korean. They identify the target by
+numeric pawn ID, DefName, class/assembly and source mod/package ID. All
+hediff component and ThingComp types are listed without guessing stealth
+from their names or executing arbitrary custom stealth properties.
+The report includes Harmony owners on the game's two visibility predicates.
+
+The game predicates are read with this mod's reveal override suppressed,
+not with all Harmony patches removed. Show Hidden Pawns and player-faction
+visibility still affect the hidden-from-player predicate. A false game
+predicate without a native invisibility component means inconclusive:
+the pawn may simply be visible, or may use an unrelated custom system.
+
+Observers' cached detection and the cache refresh tick are shown separately
+from current distance/line of sight. Line of sight is only measured by the
+explicit debug action and is skipped outside 36 tiles. Nothing updates the
+cache, changes a hediff, or calls a discovery event. No diagnostic code is
+added to a tick or render loop. The tool inspects Pawns, not arbitrary
+hidden buildings, items, implanted entities, or unknown custom stealth APIs.
+
+The 116 automated checks include real Ratkin Anomaly classes, external
+Harmony visibility patches, broken component data, nulls, cache preservation,
+observer isolation, and English/Korean key coverage. The 1.6 DLL is also run
+under the 1.7 harness, which is not a real 1.6 runtime or a UI playtest.
+
+Publishing policy: Steam uploads are manual and handled by the user.
+Development/build/test/package requests must not trigger a Steam upload.
+
 Runtime load folders:
   1.6: root (updated .NET Framework DLL), Common (translations)
   1.7: Common (translations), 1.7 (new DLL)
