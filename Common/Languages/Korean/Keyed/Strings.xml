@@ -40,10 +40,21 @@
   <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>개발자 설정: 숨은 폰 표시</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>생존 및 맵 생성 상태</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
   <ArchotechEyeInvisibilityDetection_SettingsTitle>초월공학 눈 - 투명 존재 감지</ArchotechEyeInvisibilityDetection_SettingsTitle>
+  <ArchotechEyeInvisibilityDetection_SilhouetteHeading>실루엣 가독성</ArchotechEyeInvisibilityDetection_SilhouetteHeading>
+  <ArchotechEyeInvisibilityDetection_SilhouetteOpacity>실루엣 진하기: {0}%</ArchotechEyeInvisibilityDetection_SilhouetteOpacity>
+  <ArchotechEyeInvisibilityDetection_SilhouetteOpacityTip>높일수록 감지된 대상이 선명해집니다. 15~80% 사이에서 조절할 수 있으며, 기존 기본값은 30%입니다. 대상이 잘 안 보이면 60%부터 조절해 보세요.</ArchotechEyeInvisibilityDetection_SilhouetteOpacityTip>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor>강조 색상: {0}</ArchotechEyeInvisibilityDetection_SilhouetteColor>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Original>원래 색상</ArchotechEyeInvisibilityDetection_SilhouetteColor_Original>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Cyan>청록색</ArchotechEyeInvisibilityDetection_SilhouetteColor_Cyan>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Gold>금색</ArchotechEyeInvisibilityDetection_SilhouetteColor_Gold>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_White>밝은 흰색</ArchotechEyeInvisibilityDetection_SilhouetteColor_White>
+  <ArchotechEyeInvisibilityDetection_SilhouetteReadable>잘 보이게 설정 (진하기 60% · 청록색)</ArchotechEyeInvisibilityDetection_SilhouetteReadable>
+  <ArchotechEyeInvisibilityDetection_SilhouetteReset>표시 기본값으로 복원 (진하기 30% · 원래 색상)</ArchotechEyeInvisibilityDetection_SilhouetteReset>
+  <ArchotechEyeInvisibilityDetection_SilhouetteNote>현재 감지된 대상의 실루엣에만 다음 그리기부터 적용됩니다. 초상화, 감지 범위, 시선 조건, 공격 판정은 바뀌지 않습니다. 강조 색상은 외형의 색감에 따라 다르게 보일 수 있습니다.</ArchotechEyeInvisibilityDetection_SilhouetteNote>
   <ArchotechEyeInvisibilityDetection_DetectAlphaStalking>Alpha Animals의 잠복 위장 감지</ArchotechEyeInvisibilityDetection_DetectAlphaStalking>
   <ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>Alpha Animals의 실제 잠복 헤디프와 그래픽 처리를 연결하는 선택 기능입니다. 지원되는 Alpha Animals가 있으면 기본으로 켜집니다. 위장 상태를 해제하거나 표적 정보를 공유하지 않으며, 동물의 기존 공격 대상 판정도 바꾸지 않습니다.</ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>
   <ArchotechEyeInvisibilityDetection_AlphaUnavailable>Alpha Animals 잠복 연동을 사용할 수 없습니다. 모드가 로드되지 않았거나 지원되지 않는 그래픽 API입니다.</ArchotechEyeInvisibilityDetection_AlphaUnavailable>
-  <ArchotechEyeInvisibilityDetection_SettingsNote>바닐라 방식의 투명화 감지는 이 설정과 무관하게 유지됩니다. 반경은 36칸이며 시선이 필요합니다. 변경 사항은 다음 캐시 갱신 때 반영됩니다 (최대 60게임 틱).</ArchotechEyeInvisibilityDetection_SettingsNote>
+  <ArchotechEyeInvisibilityDetection_SettingsNote>바닐라 방식의 투명화 감지는 잠복 위장 설정과 무관하게 유지됩니다. 반경은 36칸이며 시선이 필요합니다. 잠복 위장 감지 설정 변경은 다음 캐시 갱신 때 반영됩니다 (최대 60게임 틱).</ArchotechEyeInvisibilityDetection_SettingsNote>
   <ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>Alpha Animals의 실제 잠복 상태 헤디프가 있습니다. 게임의 바닐라 투명화 판정은 바꾸지 않고, 선택형 호환 모듈로 거리·시선 조건에 따라 실루엣을 표시합니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>
   <ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>Alpha Animals의 실제 잠복 상태 헤디프가 있지만, 선택형 감지 설정이 꺼져 있습니다. 바닐라 방식의 투명화는 별도로 판정합니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>지원되는 Alpha Animals 그래픽 연동 설치됨</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>

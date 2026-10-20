@@ -113,9 +113,7 @@ internal static class DetectedPawnRenderingPatch
         }
 
         // Keep the vanilla invisibility material, which supports fading on the render tree.
-        Color tint = parms.tint;
-        tint.a = ArchotechEyeVisibilityUtility.RevealedAlpha;
-        parms.tint = tint;
+        parms.tint = ArchotechEyeInvisibilityDetectionMod.Settings.ApplySilhouetteTint(parms.tint);
         if (ArchotechEyeVisibilityUtility.IsAlphaStalkingDetectedForPlayer(pawn))
         {
             parms.flags |= PawnRenderFlags.Invisible;

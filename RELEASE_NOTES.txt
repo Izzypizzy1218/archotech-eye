@@ -1,4 +1,32 @@
-Archotech Eye - Invisibility Detection 1.1.0-beta.4
+Archotech Eye - Invisibility Detection 1.1.0-beta.5
+Validated against the installed RimWorld 1.7 runtime, 2026-10-20.
+
+- Added silhouette readability controls to the ordinary mod settings:
+  opacity from 15% to 80%, plus original, cyan, gold and white highlights.
+- Kept the original 30% opacity and original colors as the default,
+  including when loading older settings without the new fields.
+- Added a one-click readability preset (60% opacity, cyan) and a separate
+  appearance reset that does not change Alpha Animals compatibility.
+- Changes apply on the next world draw to currently cached detections.
+  Portraits, atlas/cache passes and undetected pawns remain untouched.
+- Retains the native fade-capable material. The highlight blends with
+  the incoming tint; final appearance still depends on original textures.
+- No change to detection range, line of sight, the 60-tick cache, native
+  invisibility, per-observer targeting or discovery events. No extra scans,
+  draw calls, materials or line-of-sight checks were added to rendering.
+- Settings persist through native Scribe. Non-finite opacity and unknown
+  palette values are normalized safely. English/Korean labels included.
+- Both 1.6 and 1.7 Release builds passed without warnings/errors. Each
+  DLL passed 229 runtime assertions with Alpha Animals, 188 without it,
+  under the installed 1.7 engine. Includes real Ratkin Anomaly classes,
+  Alpha Animals versions, setting persistence and old-config migration.
+- These are headless state/patch/render-parameter tests. The in-game
+  settings UI and final visuals still need a visual playtest; there was
+  no real 1.6 engine playtest.
+- Steam uploads require an explicit request for each release. Development
+  and GitHub updates never trigger automatic Steam publication.
+
+Previous release: 1.1.0-beta.4
 Validated against the installed RimWorld 1.7 runtime, 2026-10-20.
 
 - Reproduced Alpha Animals' stalking event bypassing native invisibility

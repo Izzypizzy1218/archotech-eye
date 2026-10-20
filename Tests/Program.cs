@@ -143,6 +143,7 @@ internal static partial class Program
         PawnDrawParms parms = new PawnDrawParms { flags = PawnRenderFlags.Portrait, tint = Color.white };
         DetectedPawnRenderingPatch.ApplySilhouette(null, ref parms);
         Check(parms.tint.a == 1f, "Portraits keep their alpha");
+        TestSilhouetteSettings();
         TestMultipleInvisibilityHediffs();
         TestDetectionAndCombat();
         TestRatkinAnomaly();
@@ -266,6 +267,7 @@ internal static partial class Program
         parms = new PawnDrawParms { tint = Color.white, flags = PawnRenderFlags.Portrait };
         DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
         Check(parms.tint.a == 1f, "Detected pawn portrait stays unchanged");
+        TestSilhouetteRendering(component, watcher, otherWatcher, target);
         AccessTools.Field(typeof(Thing), "mapIndexOrState").SetValue(target, (sbyte)-1);
         Check(!ArchotechEyeVisibilityUtility.IsDetectedForPlayer(target), "Despawned target immediately loses visibility");
         component.MapRemoved();
@@ -342,6 +344,7 @@ internal static partial class Program
             PawnDrawParms parms = new PawnDrawParms { tint = Color.white, flags = PawnRenderFlags.Invisible };
             DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
             Check(Math.Abs(parms.tint.a - 0.3f) < 0.001f, name + " renders at alpha 0.3");
+            CheckCompatibilityAppearance(target, alphaMaterial: false);
             Check(!((HediffComp_Invisibility)nativeComp).PsychologicallyVisible, name + " remains naturally invisible without forcing its quest discovery");
             InvisibilityDiagnosticReport report = InvisibilityDiagnostics.Inspect(target);
             Check(report.State == InvisibilityDiagnosticState.ActiveGameInvisibility,

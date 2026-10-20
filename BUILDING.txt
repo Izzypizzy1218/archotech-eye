@@ -115,6 +115,26 @@ the textures, in-game settings window and final rendered silhouette have
 not been visually tested. All runtime checks use the installed 1.7 engine
 assemblies, even when the mod or Alpha Animals DLL under test is for 1.6.
 
+Silhouette readability settings (1.1.0-beta.5):
+  - Open this mod's normal settings window; Development mode is not needed.
+  - Opacity: 15%-80%. Higher values are more visible, but remain translucent.
+  - Color: original, cyan, gold or white. Colored modes blend their tint
+    with the incoming draw tint and still use the original pawn textures.
+  - Improve visibility applies 60% opacity and cyan. Restore appearance
+    defaults applies 30% and original colors, without changing stalking
+    compatibility. Existing config files retain those original defaults.
+  - World-draw parameters read these values directly, using only already
+    published detection caches. No extra LoS, hediff scan, material, draw
+    call or graphics invalidation is needed when changing appearance.
+  - Portraits, cached atlas passes and undetected targets stay unchanged.
+    Combat, the 36-tile radius and 60-game-tick cache stay unchanged too.
+  - The native Scribe save/load path is tested with every palette, older
+    settings and invalid values, using temporary files only. Tests never
+    read or write the player's real configuration files.
+  - The latest matrix passed 229 checks with Alpha Animals and 188 without
+    it for each mod DLL under the 1.7 runtime. The real 1.6 engine, settings
+    UI layout and final texture/shader appearance remain unverified.
+
 Runtime load folders:
   1.6: root (updated .NET Framework DLL), Common (translations)
   1.7: Common (translations), 1.7 (new DLL)

@@ -104,6 +104,7 @@ internal static partial class Program
         DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
         Check(Math.Abs(parms.tint.a - 0.3f) < 0.001f && parms.flags.FlagSet(PawnRenderFlags.Invisible),
             "Alpha silhouette requests the fade-capable material and alpha 0.3");
+        CheckCompatibilityAppearance(target, alphaMaterial: true);
         parms = new PawnDrawParms { tint = Color.white, flags = PawnRenderFlags.Portrait };
         DetectedPawnRenderingPatch.ApplySilhouette(target, ref parms);
         Check(parms.tint.a == 1f && !parms.flags.FlagSet(PawnRenderFlags.Invisible), "Alpha portraits remain unchanged");

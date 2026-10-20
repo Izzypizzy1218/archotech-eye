@@ -40,10 +40,21 @@
   <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>Developer setting: Show Hidden Pawns</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>Living and spawned</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
   <ArchotechEyeInvisibilityDetection_SettingsTitle>Archotech Eye - Invisibility Detection</ArchotechEyeInvisibilityDetection_SettingsTitle>
+  <ArchotechEyeInvisibilityDetection_SilhouetteHeading>Silhouette readability</ArchotechEyeInvisibilityDetection_SilhouetteHeading>
+  <ArchotechEyeInvisibilityDetection_SilhouetteOpacity>Silhouette opacity: {0}%</ArchotechEyeInvisibilityDetection_SilhouetteOpacity>
+  <ArchotechEyeInvisibilityDetection_SilhouetteOpacityTip>Higher values make detected targets clearer. Adjustable from 15% to 80%; the original default is 30%. Try 60% if a target is hard to see.</ArchotechEyeInvisibilityDetection_SilhouetteOpacityTip>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor>Highlight color: {0}</ArchotechEyeInvisibilityDetection_SilhouetteColor>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Original>Original colors</ArchotechEyeInvisibilityDetection_SilhouetteColor_Original>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Cyan>Cyan</ArchotechEyeInvisibilityDetection_SilhouetteColor_Cyan>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_Gold>Gold</ArchotechEyeInvisibilityDetection_SilhouetteColor_Gold>
+  <ArchotechEyeInvisibilityDetection_SilhouetteColor_White>Bright white</ArchotechEyeInvisibilityDetection_SilhouetteColor_White>
+  <ArchotechEyeInvisibilityDetection_SilhouetteReadable>Improve visibility (60% opacity, cyan)</ArchotechEyeInvisibilityDetection_SilhouetteReadable>
+  <ArchotechEyeInvisibilityDetection_SilhouetteReset>Restore appearance defaults (30% opacity, original colors)</ArchotechEyeInvisibilityDetection_SilhouetteReset>
+  <ArchotechEyeInvisibilityDetection_SilhouetteNote>Applies on the next draw to currently detected world silhouettes only. Portraits, range, line of sight and targeting are unchanged. Highlight appearance varies with the original textures.</ArchotechEyeInvisibilityDetection_SilhouetteNote>
   <ArchotechEyeInvisibilityDetection_DetectAlphaStalking>Detect Alpha Animals stalking camouflage</ArchotechEyeInvisibilityDetection_DetectAlphaStalking>
   <ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>Optional support for Alpha Animals' stalking-state hediff and graphics. Enabled by default when a supported Alpha Animals version is loaded. Does not remove camouflage, share targeting information or change the animal's normal targeting rules.</ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>
   <ArchotechEyeInvisibilityDetection_AlphaUnavailable>Alpha Animals stalking integration is unavailable: the mod is not loaded or its graphics API is unsupported.</ArchotechEyeInvisibilityDetection_AlphaUnavailable>
-  <ArchotechEyeInvisibilityDetection_SettingsNote>Vanilla-system invisibility detection remains enabled independently. Range stays at 36 tiles with line of sight. Changes take effect at the next 60-game-tick cache refresh.</ArchotechEyeInvisibilityDetection_SettingsNote>
+  <ArchotechEyeInvisibilityDetection_SettingsNote>Vanilla-system invisibility detection remains enabled independently of stalking camouflage support. Range stays at 36 tiles with line of sight. Changes to the stalking detection option take effect at the next 60-game-tick cache refresh.</ArchotechEyeInvisibilityDetection_SettingsNote>
   <ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>The pawn has Alpha Animals' actual stalking-state hediff. The optional compatibility module can reveal it under the normal range and line-of-sight rules, without changing the game invisibility predicate.</ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>
   <ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>The pawn has Alpha Animals' actual stalking-state hediff, but the optional detection setting is disabled. Native-system invisibility is still evaluated independently.</ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>Compatible Alpha Animals graphics integration installed</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using Verse;
@@ -23,6 +25,34 @@ public sealed class ArchotechEyeInvisibilityDetectionMod : Mod
     {
         Listing_Standard listing = new Listing_Standard();
         listing.Begin(inRect);
+        listing.Label("ArchotechEyeInvisibilityDetection_SilhouetteHeading".Translate());
+        listing.Label("ArchotechEyeInvisibilityDetection_SilhouetteOpacity".Translate(
+            Mathf.RoundToInt(Settings.SilhouetteOpacity * 100f)), tooltip:
+            "ArchotechEyeInvisibilityDetection_SilhouetteOpacityTip".Translate());
+        Settings.SilhouetteOpacity = listing.Slider(Settings.SilhouetteOpacity,
+            ArchotechEyeDetectionSettings.MinimumSilhouetteOpacity, ArchotechEyeDetectionSettings.MaximumSilhouetteOpacity);
+        if (listing.ButtonText("ArchotechEyeInvisibilityDetection_SilhouetteColor".Translate(
+            ("ArchotechEyeInvisibilityDetection_SilhouetteColor_" + Settings.SilhouetteColor).Translate())))
+        {
+            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            foreach (SilhouetteColorPreset preset in Enum.GetValues(typeof(SilhouetteColorPreset)))
+            {
+                SilhouetteColorPreset selected = preset;
+                options.Add(new FloatMenuOption(("ArchotechEyeInvisibilityDetection_SilhouetteColor_" + preset).Translate(),
+                    () => Settings.SilhouetteColor = selected));
+            }
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+        if (listing.ButtonText("ArchotechEyeInvisibilityDetection_SilhouetteReadable".Translate()))
+        {
+            Settings.UseReadableSilhouette();
+        }
+        if (listing.ButtonText("ArchotechEyeInvisibilityDetection_SilhouetteReset".Translate()))
+        {
+            Settings.ResetSilhouetteAppearance();
+        }
+        listing.Label("ArchotechEyeInvisibilityDetection_SilhouetteNote".Translate());
+        listing.GapLine();
         if (AlphaAnimalsCompatibility.Installed)
         {
             listing.CheckboxLabeled("ArchotechEyeInvisibilityDetection_DetectAlphaStalking".Translate(),
