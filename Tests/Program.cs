@@ -14,19 +14,22 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 
-internal static class Program
+internal static partial class Program
 {
     private static int assertions;
     private static string ratkinAnomalyDirectory;
+    private static string alphaAnimalsDirectory;
 
     private static int Main(string[] args)
     {
         string gameDir = args.Length > 0 ? args[0] : @"C:\Program Files (x86)\Steam\steamapps\common\RimWorld";
         string harmonyDir = args.Length > 1 ? args[1] : @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\1.7\Assemblies";
         ratkinAnomalyDirectory = args.Length > 2 ? args[2] : @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\3716441120";
+        alphaAnimalsDirectory = args.Length > 4 ? args[4] : @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\1541721856\1.7";
         AssemblyLoadContext.Default.Resolving += (context, name) =>
         {
-            foreach (string directory in new[] { gameDir, harmonyDir, Path.Combine(ratkinAnomalyDirectory, "1.6", "Assemblies"),
+            foreach (string directory in new[] { gameDir, harmonyDir, Path.Combine(alphaAnimalsDirectory, "Assemblies"), Path.Combine(ratkinAnomalyDirectory, "1.6", "Assemblies"),
+                @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\2023507013\1.7\Assemblies",
                 @"C:\Program Files (x86)\Steam\steamapps\workshop\content\294100\1578693166\1.7\Assemblies" })
             {
                 string path = Path.Combine(directory, name.Name + ".dll");
@@ -40,6 +43,11 @@ internal static class Program
 
         try
         {
+            string alphaDll = Path.Combine(alphaAnimalsDirectory, "Assemblies", "AlphaBehavioursAndEvents.dll");
+            if (File.Exists(alphaDll))
+            {
+                AssemblyLoadContext.Default.LoadFromAssemblyPath(alphaDll);
+            }
             string modPath = args.Length > 3 ? Path.GetFullPath(args[3]) :
                 Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "ArchotechEye_InvisibilityDetection.dll");
             Console.WriteLine("Testing mod assembly: " + modPath);
@@ -81,7 +89,7 @@ internal static class Program
             Check(method != null && Harmony.GetPatchInfo(method)?.Owners.Contains(ArchotechEyeInvisibilityDetectionMod.HarmonyId) == true,
                 "Harmony registered " + method?.DeclaringType?.Name + "." + method?.Name);
         }
-        Check(Harmony.GetAllPatchedMethods().Count(method => Harmony.GetPatchInfo(method).Owners.Contains(ArchotechEyeInvisibilityDetectionMod.HarmonyId)) == expected.Length,
+        Check(Harmony.GetAllPatchedMethods().Count(method => Harmony.GetPatchInfo(method).Owners.Contains(ArchotechEyeInvisibilityDetectionMod.HarmonyId)) == expected.Length + (AlphaAnimalsCompatibility.Installed ? 1 : 0),
             "Only intended methods are patched");
 
         Pawn outer = BarePawn(1);
@@ -139,6 +147,7 @@ internal static class Program
         TestDetectionAndCombat();
         TestRatkinAnomaly();
         TestDiagnostics();
+        TestAlphaAnimalsStalking();
     }
 
     private static IEnumerable<LocalTargetInfo> Candidates(Pawn observer)

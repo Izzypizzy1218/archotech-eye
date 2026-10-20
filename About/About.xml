@@ -22,6 +22,7 @@
     <li>brrainz.harmony</li>
     <li>ludeon.rimworld.anomaly</li>
     <li>fsnp.ratkinanomaly.update</li>
+    <li>sarg.alphaanimals</li>
   </loadAfter>
   <description>필요 모드: Harmony
 필요 DLC: Anomaly
@@ -39,8 +40,10 @@
 - 감지된 대상은 AI 타겟팅 및 수동 공격 가능
 - 바닐라 투명화 시스템 기준으로 판정하여 타 모드와 호환성 고려
 - 랫노말리의 투명화된 존재도 감지 가능 (랫노말리는 선택 사항)
+- Alpha Animals 북극사자의 잠복 위장 선택 지원 (모드 설정에서 끄기 가능)
 
 주의
 - Anomaly의 망령을 포함한 투명화 폰을 대상으로 합니다
-- 투명화 DefName 하드코딩 대신 바닐라 판정 기준을 사용합니다</description>
+- 기본 감지는 투명화 DefName 하드코딩 대신 바닐라 판정 기준을 사용합니다
+- 바닐라와 다른 잠복 처리는 선택형 호환 모듈로만 지원합니다</description>
 </ModMetaData>

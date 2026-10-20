@@ -80,6 +80,41 @@ under the 1.7 harness, which is not a real 1.6 runtime or a UI playtest.
 Publishing policy: Steam uploads are manual and handled by the user.
 Development/build/test/package requests must not trigger a Steam upload.
 
+Optional Alpha Animals stalking support (1.1.0-beta.4):
+  - Alpha Animals is not required and no external mod DLL is redistributed.
+  - The native invisibility predicate remains unchanged. The separate
+    adapter recognizes the actual Hediff_Stalking state type and adds it
+    to the same 36-tile/LoS cache, using no race or DefName detection rules.
+  - The graphics patch only changes the local hidden-graphics branch when
+    a player-controlled colonist's eye has a cached detection. It preserves
+    the actual hediff, original AI rules, and ordinary/alternate graphics.
+  - Rendering reads only the cache. It does not check LoS, scan hediffs,
+    reflect over mods, remove camouflage or invoke discovery events.
+  - Mod settings: Alpha Animals stalking camouflage detection. Enabled
+    by default for supported Alpha Animals versions, and can be disabled
+    without disabling native invisibility detection. Cache latency is up
+    to 60 game ticks. Unsupported graphics API shapes disable the adapter.
+  - The developer report shows adapter availability, the active option,
+    and whether the actual stalking hediff exists. It does not guess other
+    custom stealth systems from their names.
+
+The runtime harness preloads the installed 1.7 Alpha Animals DLL by default
+when present. A fifth argument selects another version directory (the one
+containing Assemblies/), such as WORKSHOP/1541721856/1.6. Use '-' as the fifth
+argument for a fresh-process test without loading Alpha Animals. The fourth
+argument remains the mod DLL to test. No direct Alpha Animals compile-time
+reference is used in production or tests.
+
+The matrix passed 160 assertions with the real Alpha Animals DLL and 120
+without it. It covers native-only reproduction, missing dependencies,
+settings toggles, walls, 36/37-tile boundaries, per-observer isolation,
+non-player observers, render-parameter alpha/material flags, stale caches,
+overlapping native/custom invisibility, graphics invalidation, and map
+removal. Graphics invalidation is intercepted in the headless harness;
+the textures, in-game settings window and final rendered silhouette have
+not been visually tested. All runtime checks use the installed 1.7 engine
+assemblies, even when the mod or Alpha Animals DLL under test is for 1.6.
+
 Runtime load folders:
   1.6: root (updated .NET Framework DLL), Common (translations)
   1.7: Common (translations), 1.7 (new DLL)

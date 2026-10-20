@@ -116,6 +116,10 @@ internal static class DetectedPawnRenderingPatch
         Color tint = parms.tint;
         tint.a = ArchotechEyeVisibilityUtility.RevealedAlpha;
         parms.tint = tint;
+        if (ArchotechEyeVisibilityUtility.IsAlphaStalkingDetectedForPlayer(pawn))
+        {
+            parms.flags |= PawnRenderFlags.Invisible;
+        }
     }
 }
 

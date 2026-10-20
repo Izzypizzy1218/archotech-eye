@@ -17,3 +17,16 @@
   Report this as inconclusive rather than guessing from DefNames or types.
 - Build both 1.6 and 1.7. Tests using the 1.7 runtime are not a real 1.6
   playtest, and headless checks do not verify the in-game dialog visually.
+
+# Optional Stealth Adapters
+
+- Keep the core raw invisibility predicate native-only. Non-native stealth
+  must be handled in a separate, explicitly supported adapter.
+- Alpha Animals support uses its actual stalking-state hediff type, never
+  a race check or a guessed DefName. Preserve the hediff and native AI rules.
+- The optional adapter is enabled by default when its supported API is
+  loaded and can be disabled in mod settings. It is not a required mod.
+- Rendering and the optional graphics branch must only read published
+  caches. Do not scan hediffs, resolve types, or check LoS during rendering.
+- Invalidate graphics when either player detection or custom visual-state
+  membership changes, including when native invisibility remains active.

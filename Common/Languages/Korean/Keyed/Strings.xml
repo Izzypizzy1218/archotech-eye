@@ -39,4 +39,15 @@
   <ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>보고서를 로그에 기록</ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>
   <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>개발자 설정: 숨은 폰 표시</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>생존 및 맵 생성 상태</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
+  <ArchotechEyeInvisibilityDetection_SettingsTitle>초월공학 눈 - 투명 존재 감지</ArchotechEyeInvisibilityDetection_SettingsTitle>
+  <ArchotechEyeInvisibilityDetection_DetectAlphaStalking>Alpha Animals의 잠복 위장 감지</ArchotechEyeInvisibilityDetection_DetectAlphaStalking>
+  <ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>Alpha Animals의 실제 잠복 헤디프와 그래픽 처리를 연결하는 선택 기능입니다. 지원되는 Alpha Animals가 있으면 기본으로 켜집니다. 위장 상태를 해제하거나 표적 정보를 공유하지 않으며, 동물의 기존 공격 대상 판정도 바꾸지 않습니다.</ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>
+  <ArchotechEyeInvisibilityDetection_AlphaUnavailable>Alpha Animals 잠복 연동을 사용할 수 없습니다. 모드가 로드되지 않았거나 지원되지 않는 그래픽 API입니다.</ArchotechEyeInvisibilityDetection_AlphaUnavailable>
+  <ArchotechEyeInvisibilityDetection_SettingsNote>바닐라 방식의 투명화 감지는 이 설정과 무관하게 유지됩니다. 반경은 36칸이며 시선이 필요합니다. 변경 사항은 다음 캐시 갱신 때 반영됩니다 (최대 60게임 틱).</ArchotechEyeInvisibilityDetection_SettingsNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>Alpha Animals의 실제 잠복 상태 헤디프가 있습니다. 게임의 바닐라 투명화 판정은 바꾸지 않고, 선택형 호환 모듈로 거리·시선 조건에 따라 실루엣을 표시합니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>Alpha Animals의 실제 잠복 상태 헤디프가 있지만, 선택형 감지 설정이 꺼져 있습니다. 바닐라 방식의 투명화는 별도로 판정합니다.</ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>지원되는 Alpha Animals 그래픽 연동 설치됨</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaEnabled>Alpha Animals 잠복 감지 설정 켜짐</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaEnabled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaStalking>실제 Alpha Animals 잠복 헤디프 있음</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaStalking>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaNote>DefName을 추측하는 방식이 아닌, 명시적인 상태 기반 호환 모듈입니다. Alpha Animals의 잠복 이벤트는 그림을 숨기며 바닐라 투명화 판정을 사용하지 않습니다. 원래의 공격 대상 판정은 유지됩니다.</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaNote>
 </LanguageData>

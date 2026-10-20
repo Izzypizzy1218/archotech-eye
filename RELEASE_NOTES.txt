@@ -1,4 +1,36 @@
-Archotech Eye - Invisibility Detection 1.1.0-beta.3
+Archotech Eye - Invisibility Detection 1.1.0-beta.4
+Validated against the installed RimWorld 1.7 runtime, 2026-10-20.
+
+- Reproduced Alpha Animals' stalking event bypassing native invisibility
+  detection, using its actual stalking hediff class and installed XML.
+- Added a separate optional adapter for that state. It uses the actual
+  Hediff_Stalking type, not a race check, DefName guess or texture-name scan.
+- Keeps native psychological invisibility and original animal targeting
+  rules unchanged. The stalking hediff is never removed to reveal a pawn.
+- Uses the normal 36-tile, line-of-sight, 60-tick per-observer cache. Only
+  player-controlled colonists contribute to the player's silhouette cache.
+- Bypasses only Alpha Animals' hidden-graphics branch for cached detections,
+  preserving its ordinary and alternate-graphics branches. Requests the
+  game's fading material and alpha 0.3 without doing LoS work in rendering.
+- Clears both caches on map removal and invalidates graphics when custom
+  visual-state membership changes, even if native detection stays active.
+- Added an Alpha Animals stalking-detection checkbox in mod settings.
+  Enabled by default for the supported API; changes apply within 60 ticks.
+  Native-system detection is independent of this option.
+- Missing Alpha Animals registers no optional patch. An unexpected graphics
+  method shape disables the adapter instead of guessing how to patch it.
+- Diagnostics distinguish supported custom stalking from native invisibility
+  and report when the optional setting is disabled, in English and Korean.
+- Both 1.6 and 1.7 Release builds passed with no warnings/errors. Runtime
+  checks passed: 160 with Alpha Animals, 120 without it. Both versions of
+  Alpha Animals' DLL were checked under the installed 1.7 runtime.
+- These are headless state/patch/render-parameter tests, not a visual
+  playtest or a real 1.6 engine test. In-game silhouette/settings UI still
+  need visual verification.
+- Steam uploads require an explicit request for each release. Development
+  and GitHub updates never trigger automatic Steam publication.
+
+Previous release: 1.1.0-beta.3
 Validated against RimWorld 1.7.4982 rev1280, 2026-10-19.
 
 - Added an on-demand developer action under Archotech Eye:

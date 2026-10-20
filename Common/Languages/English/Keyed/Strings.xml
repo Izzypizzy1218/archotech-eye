@@ -39,4 +39,15 @@
   <ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>Write Report to Log</ArchotechEyeInvisibilityDetection_Diagnostics_WriteLog>
   <ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>Developer setting: Show Hidden Pawns</ArchotechEyeInvisibilityDetection_Diagnostics_ShowHiddenPawns>
   <ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>Living and spawned</ArchotechEyeInvisibilityDetection_Diagnostics_AliveAndSpawned>
+  <ArchotechEyeInvisibilityDetection_SettingsTitle>Archotech Eye - Invisibility Detection</ArchotechEyeInvisibilityDetection_SettingsTitle>
+  <ArchotechEyeInvisibilityDetection_DetectAlphaStalking>Detect Alpha Animals stalking camouflage</ArchotechEyeInvisibilityDetection_DetectAlphaStalking>
+  <ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>Optional support for Alpha Animals' stalking-state hediff and graphics. Enabled by default when a supported Alpha Animals version is loaded. Does not remove camouflage, share targeting information or change the animal's normal targeting rules.</ArchotechEyeInvisibilityDetection_DetectAlphaStalkingTip>
+  <ArchotechEyeInvisibilityDetection_AlphaUnavailable>Alpha Animals stalking integration is unavailable: the mod is not loaded or its graphics API is unsupported.</ArchotechEyeInvisibilityDetection_AlphaUnavailable>
+  <ArchotechEyeInvisibilityDetection_SettingsNote>Vanilla-system invisibility detection remains enabled independently. Range stays at 36 tiles with line of sight. Changes take effect at the next 60-game-tick cache refresh.</ArchotechEyeInvisibilityDetection_SettingsNote>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>The pawn has Alpha Animals' actual stalking-state hediff. The optional compatibility module can reveal it under the normal range and line-of-sight rules, without changing the game invisibility predicate.</ArchotechEyeInvisibilityDetection_Diagnostics_State_SupportedCustomStealth>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>The pawn has Alpha Animals' actual stalking-state hediff, but the optional detection setting is disabled. Native-system invisibility is still evaluated independently.</ArchotechEyeInvisibilityDetection_Diagnostics_State_CustomStealthDisabled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>Compatible Alpha Animals graphics integration installed</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaInstalled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaEnabled>Alpha Animals stalking detection setting enabled</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaEnabled>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaStalking>Actual Alpha Animals stalking hediff present</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaStalking>
+  <ArchotechEyeInvisibilityDetection_Diagnostics_AlphaNote>This is an explicit state-based adapter, not a guessed DefName match. Alpha Animals' stalking event hides graphics but does not use native psychological invisibility; its existing targeting rules are preserved.</ArchotechEyeInvisibilityDetection_Diagnostics_AlphaNote>
 </LanguageData>

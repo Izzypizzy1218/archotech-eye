@@ -14,10 +14,12 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
     {
         public readonly Dictionary<Pawn, HashSet<Pawn>> ByWatcher = new Dictionary<Pawn, HashSet<Pawn>>();
         public readonly HashSet<Pawn> ForPlayer = new HashSet<Pawn>();
+        public readonly HashSet<Pawn> AlphaStalkingForPlayer = new HashSet<Pawn>();
     }
 
     private DetectionSnapshot snapshot = new DetectionSnapshot();
     private readonly List<Pawn> invisibleTargets = new List<Pawn>();
+    private readonly HashSet<Pawn> alphaStalkingTargets = new HashSet<Pawn>();
     private readonly List<Pawn> watchers = new List<Pawn>();
     private readonly HashSet<Pawn> changedTargets = new HashSet<Pawn>();
     private int lastRefreshTick = -1;
@@ -59,10 +61,16 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
         return target != null && Volatile.Read(ref snapshot).ForPlayer.Contains(target);
     }
 
+    internal bool IsAlphaStalkingDetectedForPlayer(Pawn target)
+    {
+        return target != null && Volatile.Read(ref snapshot).AlphaStalkingForPlayer.Contains(target);
+    }
+
     public override void MapRemoved()
     {
         Volatile.Write(ref snapshot, new DetectionSnapshot());
         invisibleTargets.Clear();
+        alphaStalkingTargets.Clear();
         watchers.Clear();
         changedTargets.Clear();
     }
@@ -71,6 +79,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
     {
         DetectionSnapshot previous = Volatile.Read(ref snapshot);
         invisibleTargets.Clear();
+        alphaStalkingTargets.Clear();
         watchers.Clear();
 
         IReadOnlyList<Pawn> spawnedPawns = map?.mapPawns?.AllPawnsSpawned;
@@ -91,7 +100,16 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
                 for (int i = 0; i < spawnedPawns.Count; i++)
                 {
                     Pawn pawn = spawnedPawns[i];
-                    if (pawn?.Spawned == true && !pawn.Dead && ArchotechEyeVisibilityUtility.IsVanillaInvisible(pawn))
+                    if (pawn?.Spawned != true || pawn.Dead)
+                    {
+                        continue;
+                    }
+                    bool alphaStalking = AlphaAnimalsCompatibility.Enabled && AlphaAnimalsCompatibility.HasStalkingHediff(pawn);
+                    if (alphaStalking)
+                    {
+                        alphaStalkingTargets.Add(pawn);
+                    }
+                    if (ArchotechEyeVisibilityUtility.IsVanillaInvisible(pawn) || alphaStalking)
                     {
                         invisibleTargets.Add(pawn);
                     }
@@ -128,6 +146,10 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
                 if (revealForPlayer)
                 {
                     next.ForPlayer.Add(target);
+                    if (alphaStalkingTargets.Contains(target))
+                    {
+                        next.AlphaStalkingForPlayer.Add(target);
+                    }
                 }
             }
 
@@ -139,7 +161,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
 
         Volatile.Write(ref snapshot, next);
         lastRefreshTick = ticksGame;
-        NotifyChangedTargets(previous.ForPlayer, next.ForPlayer);
+        NotifyChangedTargets(previous, next);
     }
 
     private bool CanWatcherDetectTarget(Pawn watcher, Pawn target)
@@ -149,11 +171,25 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
             GenSight.LineOfSight(watcher.Position, target.Position, map, skipFirstCell: true);
     }
 
-    private void NotifyChangedTargets(HashSet<Pawn> previous, HashSet<Pawn> current)
+    private void NotifyChangedTargets(DetectionSnapshot previous, DetectionSnapshot current)
     {
         changedTargets.Clear();
-        changedTargets.UnionWith(previous);
-        changedTargets.SymmetricExceptWith(current);
+        changedTargets.UnionWith(previous.ForPlayer);
+        changedTargets.SymmetricExceptWith(current.ForPlayer);
+        foreach (Pawn target in previous.AlphaStalkingForPlayer)
+        {
+            if (!current.AlphaStalkingForPlayer.Contains(target))
+            {
+                changedTargets.Add(target);
+            }
+        }
+        foreach (Pawn target in current.AlphaStalkingForPlayer)
+        {
+            if (!previous.AlphaStalkingForPlayer.Contains(target))
+            {
+                changedTargets.Add(target);
+            }
+        }
 
         Pawn newlyDetectedRevenant = null;
         foreach (Pawn target in changedTargets)
@@ -164,7 +200,7 @@ public sealed class InvisibilityDetectionMapComponent : MapComponent
             }
 
             target.Drawer?.renderer?.SetAllGraphicsDirty();
-            if (newlyDetectedRevenant == null && current.Contains(target) &&
+            if (newlyDetectedRevenant == null && current.ForPlayer.Contains(target) && !previous.ForPlayer.Contains(target) &&
                 ArchotechEyeVisibilityUtility.IsRevenant(target))
             {
                 newlyDetectedRevenant = target;

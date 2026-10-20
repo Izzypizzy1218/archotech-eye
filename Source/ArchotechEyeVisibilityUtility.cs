@@ -109,6 +109,12 @@ internal static class ArchotechEyeVisibilityUtility
         return target.Map?.GetComponent<InvisibilityDetectionMapComponent>()?.IsDetectedForPlayer(target) == true;
     }
 
+    internal static bool IsAlphaStalkingDetectedForPlayer(Pawn target)
+    {
+        return target?.health != null && target.Spawned && !target.Dead &&
+            target.Map?.GetComponent<InvisibilityDetectionMapComponent>()?.IsAlphaStalkingDetectedForPlayer(target) == true;
+    }
+
     public static bool IsRevenant(Pawn pawn)
     {
         if (pawn == null)

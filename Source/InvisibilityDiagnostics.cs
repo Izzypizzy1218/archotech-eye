@@ -12,6 +12,8 @@ namespace ArchotechEye_InvisibilityDetection;
 internal enum InvisibilityDiagnosticState
 {
     ActiveGameInvisibility,
+    SupportedCustomStealth,
+    CustomStealthDisabled,
     InactiveVanillaComponent,
     NoVanillaEvidence,
     Unavailable
@@ -70,6 +72,9 @@ internal sealed class InvisibilityDiagnosticReport
     public DiagnosticBool GameInvisible = new DiagnosticBool();
     public DiagnosticBool HiddenFromPlayer = new DiagnosticBool();
     public DiagnosticBool CachedForPlayer = new DiagnosticBool();
+    public bool AlphaAdapterInstalled;
+    public bool AlphaAdapterEnabled;
+    public DiagnosticBool AlphaStalking = new DiagnosticBool();
     public InvisibilityDiagnosticState State = InvisibilityDiagnosticState.Unavailable;
     public int LastRefreshTick = -1;
     public int? CurrentTick;
@@ -113,6 +118,14 @@ internal static class InvisibilityDiagnostics
             nativeComponents += hediff.InvisibilityComponents.Count;
         }
         report.State = Classify(report.GameInvisible, nativeComponents);
+        report.AlphaAdapterInstalled = AlphaAnimalsCompatibility.Installed;
+        report.AlphaAdapterEnabled = AlphaAnimalsCompatibility.Enabled;
+        report.AlphaStalking = DiagnosticBool.Read(() => AlphaAnimalsCompatibility.HasStalkingHediff(pawn));
+        if (report.GameInvisible.Value == false && report.AlphaStalking.Value == true)
+        {
+            report.State = report.AlphaAdapterEnabled ? InvisibilityDiagnosticState.SupportedCustomStealth :
+                InvisibilityDiagnosticState.CustomStealthDisabled;
+        }
 
         if (pawn.AllComps != null)
         {
@@ -271,6 +284,10 @@ internal static class InvisibilityDiagnostics
         Field(text, "ShowHiddenPawns", Bool(report.ShowHiddenPawns));
         Field(text, "State", T("State_" + report.State));
         text.AppendLine(T("PredicateNote")).AppendLine();
+        Field(text, "AlphaInstalled", Bool(report.AlphaAdapterInstalled));
+        Field(text, "AlphaEnabled", Bool(report.AlphaAdapterEnabled));
+        Field(text, "AlphaStalking", FormatBool(report.AlphaStalking));
+        text.AppendLine(T("AlphaNote")).AppendLine();
         Field(text, "CachedForPlayer", FormatBool(report.CachedForPlayer));
         Field(text, "CacheTick", report.LastRefreshTick.ToString(CultureInfo.InvariantCulture));
         Field(text, "CurrentTick", report.CurrentTick?.ToString(CultureInfo.InvariantCulture) ?? "-");
